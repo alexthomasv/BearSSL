@@ -287,7 +287,100 @@ clear_max_plaintext(const br_sslrec_out_clear_context *cc,
 	size_t *start, size_t *end);
 static unsigned char *
 clear_encrypt(br_sslrec_out_clear_context *cc,
-	int record_type, unsigned version, void *data, size_t *data_len);	
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+cbc_encrypt(br_sslrec_out_cbc_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+gcm_encrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+ccm_encrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+chapol_encrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+cbc_decrypt(br_sslrec_in_cbc_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+gcm_decrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+ccm_decrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+chapol_decrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static int cbc_check_length(const br_sslrec_in_class **ctx, size_t len);
+static int gcm_check_length(const br_sslrec_in_class **ctx, size_t len);
+static int ccm_check_length(const br_sslrec_in_class **ctx, size_t len);
+static int chapol_check_length(const br_sslrec_in_class **ctx, size_t len);
+
+void generic_max_plaintext(void *fn_pointer, const br_sslrec_out_class *const *ctx, size_t *start, size_t *end)
+{
+	if (fn_pointer == &clear_max_plaintext) {
+		return clear_max_plaintext(ctx, start, end);
+	} else {
+		assert(0);
+	}
+}
+
+void generic_clear_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
+		int record_type, unsigned version,
+		void *plaintext, size_t *len)
+{
+	if (fn_pointer == &clear_encrypt) {
+		clear_encrypt(ctx, record_type, version, plaintext, len);
+	} else {	
+		assert(0);
+	}
+}
+
+unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
+		int record_type, unsigned version,
+		void *plaintext, size_t *len){
+	if (fn_pointer == &clear_encrypt) {
+		return clear_encrypt(ctx, record_type, version, plaintext, len);
+	} else if (fn_pointer == &cbc_encrypt) {
+		return cbc_encrypt(ctx, record_type, version, plaintext, len);
+	} else if (fn_pointer == &gcm_encrypt) {
+		return gcm_encrypt(ctx, record_type, version, plaintext, len);
+	} else if (fn_pointer == &ccm_encrypt) {
+		return ccm_encrypt(ctx, record_type, version, plaintext, len);
+	} else if (fn_pointer == &chapol_encrypt) {
+		return chapol_encrypt(ctx, record_type, version, plaintext, len);
+	} else {
+		assert(0);
+	}
+}
+
+unsigned char *generic_decrypt(void *fn_pointer, const br_sslrec_in_class **ctx,
+		int record_type, unsigned version,
+		void *ciphertext, size_t *len){
+	if (fn_pointer == &cbc_decrypt) {
+		return cbc_decrypt(ctx, record_type, version, ciphertext, len);
+	} else if (fn_pointer == &gcm_decrypt) {
+		return gcm_decrypt(ctx, record_type, version, ciphertext, len);
+	} else if (fn_pointer == &ccm_decrypt) {
+		return ccm_decrypt(ctx, record_type, version, ciphertext, len);
+	} else if (fn_pointer == &chapol_decrypt) {
+		return chapol_decrypt(ctx, record_type, version, ciphertext, len);
+	} else {
+		assert(0);
+	}
+}
+
+
 
 /* see inner.h */
 void
@@ -322,7 +415,8 @@ make_ready_out(br_ssl_engine_context *rc)
 
 	a = 5;
 	b = rc->obuf_len - a;
-	rc->out.vtable->max_plaintext(&rc->out.vtable, &a, &b);
+	generic_max_plaintext((void *) rc->out.vtable->max_plaintext, &rc->out.vtable, &a, &b);
+	// rc->out.vtable->max_plaintext(&rc->out.vtable, &a, &b);
 	if ((b - a) > rc->max_frag_len) {
 		b = a + rc->max_frag_len;
 	}
@@ -454,10 +548,6 @@ br_ssl_engine_set_buffers_bidi(br_ssl_engine_context *rc,
 		rc->peer_log_max_frag_len = 0;
 	}
 	rc->out.vtable = &br_sslrec_out_clear_vtable;
-#ifndef TEST 
-	((br_sslrec_out_class *)rc->out.vtable)->max_plaintext = clear_max_plaintext;
-	((br_sslrec_out_class *)rc->out.vtable)->encrypt = clear_encrypt;
-#endif
 
 	make_ready_in(rc);
 	make_ready_out(rc);
@@ -532,6 +622,127 @@ rng_init(br_ssl_engine_context *cc)
 	cc->rng_init_done = 1;
 	return 1;
 }
+
+void generic_hash_init(void *fn_pointer, const br_hash_class **ctx){
+	if (fn_pointer == &br_sha256_init) {
+		br_sha256_init(ctx);
+	} else if (fn_pointer == &br_sha384_init) {
+		br_sha384_init(ctx);
+	} else if (fn_pointer == &br_sha1_init) {
+		br_sha1_init(ctx);
+	} else if (fn_pointer == &br_md5_init) {
+		br_md5_init(ctx);
+	} else if (fn_pointer == &br_sha224_init) {
+		br_sha224_init(ctx);
+	} else if (fn_pointer == &br_sha512_init) {
+		br_sha512_init(ctx);
+	} else {
+		assert(0);
+	}
+}
+
+void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, const void *data, size_t len){
+	if (fn_pointer == &br_sha256_update) {
+		br_sha256_update(ctx, data, len);
+	} else if (fn_pointer == &br_sha384_update) {
+		br_sha384_update(ctx, data, len);
+	} else if (fn_pointer == &br_sha1_update) {
+		br_sha1_update(ctx, data, len);
+	} else if (fn_pointer == &br_md5_update) {
+		br_md5_update(ctx, data, len);
+	} else if (fn_pointer == &br_sha224_update) {
+		br_sha224_update(ctx, data, len);
+	} else if (fn_pointer == &br_sha512_update) {
+		br_sha512_update(ctx, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst){
+	if (fn_pointer == &br_sha256_out) {
+		br_sha256_out(ctx, dst);
+	} else if (fn_pointer == &br_sha384_out) {
+		br_sha384_out(ctx, dst);
+	} else if (fn_pointer == &br_sha1_out) {
+		br_sha1_out(ctx, dst);
+	} else if (fn_pointer == &br_md5_out) {
+		br_md5_out(ctx, dst);
+	} else if (fn_pointer == &br_sha224_out) {
+		br_sha224_out(ctx, dst);
+	} else if (fn_pointer == &br_sha512_out) {
+		br_sha512_out(ctx, dst);
+	} else {
+		assert(0);
+	}
+}
+
+uint64_t generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, void *out){
+	if (fn_pointer == &br_sha256_state) {
+		return br_sha256_state(ctx, out);
+	} else if (fn_pointer == &br_sha384_state) {
+		return br_sha384_state(ctx, out);
+	} else if (fn_pointer == &br_sha1_state) {
+		return br_sha1_state(ctx, out);
+	} else if (fn_pointer == &br_md5_state) {
+		return br_md5_state(ctx, out);
+	} else if (fn_pointer == &br_sha224_state) {
+		return br_sha224_state(ctx, out);
+	} else if (fn_pointer == &br_sha512_state) {
+		return br_sha512_state(ctx, out);
+	} else {
+		assert(0);
+	}
+}
+
+void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, void *stb, uint64_t count){
+	if (fn_pointer == &br_sha256_set_state) {
+		br_sha256_set_state(ctx, stb, count);
+	} else if (fn_pointer == &br_sha384_set_state) {
+		br_sha384_set_state(ctx, stb, count);
+	} else if (fn_pointer == &br_sha1_set_state) {
+		br_sha1_set_state(ctx, stb, count);
+	} else if (fn_pointer == &br_md5_set_state) {
+		br_md5_set_state(ctx, stb, count);
+	} else if (fn_pointer == &br_sha224_set_state) {
+		br_sha224_set_state(ctx, stb, count);
+	} else if (fn_pointer == &br_sha512_set_state) {
+		br_sha512_set_state(ctx, stb, count);
+	} else {
+		assert(0);
+	}
+}
+
+static int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_t len){
+	 if (fn_pointer == &cbc_check_length) {
+		return cbc_check_length(ctx, len);
+	} else if (fn_pointer == &gcm_check_length) {
+		return gcm_check_length(ctx, len);
+	} else if (fn_pointer == &ccm_check_length) {
+		return ccm_check_length(ctx, len);
+	} else if (fn_pointer == &chapol_check_length) {
+		return chapol_check_length(ctx, len);
+	} else {
+		assert(0);
+	}
+}
+
+uint32_t generic_mul_add(void *fn_pointer, uint32_t a, uint32_t b, uint32_t c){
+	if (fn_pointer == &api_mulgen) {
+		return api_mulgen(a, b, c);
+	} else {
+		assert(0);
+	}
+}
+
+uint32_t generic_irsa(void *fn_pointer, uint32_t a, uint32_t b, uint32_t c){
+	if (fn_pointer == &irsa) {
+		return irsa(a, b, c);
+	} else {
+		assert(0);
+	}
+}
+
 
 /* see inner.h */
 int
@@ -708,8 +919,9 @@ recvrec_ack(br_ssl_engine_context *rc, size_t len)
 		 */
 		rlen = br_dec16be(rc->ibuf + 3);
 		if (rc->incrypt) {
-			if (!rc->in.vtable->check_length(
-				&rc->in.vtable, rlen))
+			// if (!rc->in.vtable->check_length(
+			// 	&rc->in.vtable, rlen))
+			if (!generic_check_length(rc->in.vtable->check_length, &rc->in.vtable, rlen))
 			{
 				br_ssl_engine_fail(rc, BR_ERR_BAD_LENGTH);
 				return;
@@ -770,8 +982,10 @@ recvrec_ack(br_ssl_engine_context *rc, size_t len)
 	 * We got the full record. Decrypt it.
 	 */
 	pbuf_len = rc->ixa - 5;
-	pbuf = rc->in.vtable->decrypt(&rc->in.vtable,
+	pbuf = generic_decrypt(rc->in.vtable->decrypt, &rc->in.vtable,
 		rc->record_type_in, rc->version_in, rc->ibuf + 5, &pbuf_len);
+	// pbuf = rc->in.vtable->decrypt(&rc->in.vtable,
+	// 	rc->record_type_in, rc->version_in, rc->ibuf + 5, &pbuf_len);
 	if (pbuf == 0) {
 		br_ssl_engine_fail(rc, BR_ERR_BAD_MAC);
 		return;
@@ -878,9 +1092,12 @@ sendpld_flush(br_ssl_engine_context *rc, int force)
 	if (xlen == 0 && !force) {
 		return;
 	}
-	buf = rc->out.vtable->encrypt(&rc->out.vtable,
+	buf = generic_encrypt(rc->out.vtable->encrypt, &rc->out.vtable,
 		rc->record_type_out, rc->version_out,
 		rc->obuf + rc->oxc, &xlen);
+	// buf = rc->out.vtable->encrypt(&rc->out.vtable,
+	// 	rc->record_type_out, rc->version_out,
+	// 	rc->obuf + rc->oxc, &xlen);
 	rc->oxb = rc->oxa = (size_t)(buf - rc->obuf);
 	rc->oxc = rc->oxa + xlen;
 }
@@ -1045,6 +1262,14 @@ const br_sslrec_out_class br_sslrec_out_clear_vtable = {
  * closures or renegotiations.
  */
 
+void generic_hs_run(void *fn_pointer, void *cc){
+	if (fn_pointer == &br_ssl_hs_client_run) {
+		br_ssl_hs_client_run(cc);
+	} else {
+		assert(0);
+	}
+}
+
 /* see bearssl_ssl.h */
 void
 br_ssl_engine_set_suites(br_ssl_engine_context *cc,
@@ -1107,7 +1332,8 @@ jump_handshake(br_ssl_engine_context *cc, int action)
 		cc->hlen_in = hlen_in;
 		cc->hlen_out = hlen_out;
 		cc->action = action;
-		cc->hsrun(&cc->cpu);
+		generic_hs_run(&cc->hsrun, &cc->cpu);
+		// cc->hsrun(&cc->cpu);
 		if (br_ssl_engine_closed(cc)) {
 			return;
 		}

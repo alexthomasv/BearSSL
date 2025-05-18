@@ -94,9 +94,12 @@ br_multihash_init(br_multihash_context *ctx)
 		if (hc != NULL) {
 			gen_hash_context g;
 
-			hc->init(&g.vtable);
-			hc->state(&g.vtable,
+			generic_init(hc->init, &g.vtable);
+			generic_state(hc->state, &g.vtable,
 				(unsigned char *)ctx + get_state_offset(i));
+			// hc->init(&g.vtable);
+			// hc->state(&g.vtable,
+			// 	(unsigned char *)ctx + get_state_offset(i));
 		}
 	}
 }

@@ -24,6 +24,12 @@
 
 #include "inner.h"
 
+extern void generic_hash_init(void *fn_pointer, const br_hash_class **ctx);
+extern void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, const void *data, size_t len);
+extern void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst);
+extern void generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, void *out);
+extern void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, void *stb, uint64_t count);
+
 static inline size_t
 block_size(const br_hash_class *dig)
 {
@@ -47,9 +53,12 @@ process_key(const br_hash_class **hc, void *ks,
 		tmp[u] ^= (unsigned char)bb;
 	}
 	memset(tmp + key_len, bb, blen - key_len);
-	(*hc)->init(hc);
-	(*hc)->update(hc, tmp, blen);
-	(*hc)->state(hc, ks);
+	generic_hash_init((*hc)->init, hc);
+	generic_hash_update((*hc)->update, hc, tmp, blen);
+	generic_hash_state((*hc)->state, hc, ks);
+	// (*hc)->init(hc);
+	// (*hc)->update(hc, tmp, blen);
+	// (*hc)->state(hc, ks);
 }
 
 /* see bearssl.h */
@@ -63,9 +72,12 @@ br_hmac_key_init(br_hmac_key_context *kc,
 	kc->dig_vtable = dig;
 	hc.vtable = dig;
 	if (key_len > block_size(dig)) {
-		dig->init(&hc.vtable);
-		dig->update(&hc.vtable, key, key_len);
-		dig->out(&hc.vtable, kbuf);
+		generic_hash_init(dig->init, &hc.vtable);
+		generic_hash_update(dig->update, &hc.vtable, key, key_len);
+		generic_hash_out(dig->out, &hc.vtable, kbuf);
+		// dig->init(&hc.vtable);
+		// dig->update(&hc.vtable, key, key_len);
+		// dig->out(&hc.vtable, kbuf);
 		key = kbuf;
 		key_len = br_digest_size(dig);
 	}
@@ -83,8 +95,11 @@ br_hmac_init(br_hmac_context *ctx,
 
 	dig = kc->dig_vtable;
 	blen = block_size(dig);
-	dig->init(&ctx->dig.vtable);
-	dig->set_state(&ctx->dig.vtable, kc->ksi, (uint64_t)blen);
+
+	generic_hash_init(dig->init, &ctx->dig.vtable);
+	generic_hash_set_state(dig->set_state, &ctx->dig.vtable, kc->ksi, (uint64_t)blen);
+	// dig->init(&ctx->dig.vtable);
+	// dig->set_state(&ctx->dig.vtable, kc->ksi, (uint64_t)blen);
 	memcpy(ctx->kso, kc->kso, sizeof kc->kso);
 	hlen = br_digest_size(dig);
 	if (out_len > 0 && out_len < hlen) {
@@ -97,7 +112,8 @@ br_hmac_init(br_hmac_context *ctx,
 void
 br_hmac_update(br_hmac_context *ctx, const void *data, size_t len)
 {
-	ctx->dig.vtable->update(&ctx->dig.vtable, data, len);
+	generic_hash_update(ctx->dig.vtable->update, &ctx->dig.vtable, data, len);
+	// ctx->dig.vtable->update(&ctx->dig.vtable, data, len);
 }
 
 /* see bearssl.h */
@@ -110,13 +126,17 @@ br_hmac_out(const br_hmac_context *ctx, void *out)
 	size_t blen, hlen;
 
 	dig = ctx->dig.vtable;
-	dig->out(&ctx->dig.vtable, tmp);
+	generic_hash_out(dig->out, &ctx->dig.vtable, tmp);
+	// dig->out(&ctx->dig.vtable, tmp);
 	blen = block_size(dig);
-	dig->init(&hc.vtable);
-	dig->set_state(&hc.vtable, ctx->kso, (uint64_t)blen);
+	generic_hash_init(dig->init, &hc.vtable);
+	generic_hash_set_state(dig->set_state, &hc.vtable, ctx->kso, (uint64_t)blen);
+	// dig->init(&hc.vtable);
+	// dig->set_state(&hc.vtable, ctx->kso, (uint64_t)blen);
 	hlen = br_digest_size(dig);
-	dig->update(&hc.vtable, tmp, hlen);
-	dig->out(&hc.vtable, tmp);
+	generic_hash_update(dig->update, &hc.vtable, tmp, hlen);
+	// dig->update(&hc.vtable, tmp, hlen);
+	// dig->out(&hc.vtable, tmp);
 	memcpy(out, tmp, ctx->out_len);
 	return ctx->out_len;
 }

@@ -335,7 +335,7 @@
 	|| defined __linux__ \
 	|| (defined __sun && (defined __SVR4 || defined __svr4__)) \
 	|| (defined __APPLE__ && defined __MACH__)
-#define BR_USE_URANDOM   1
+#define BR_USE_URANDOM   0
 #endif
 #endif
 
@@ -344,13 +344,13 @@
 	&& (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))) \
 	|| (defined __FreeBSD__ && __FreeBSD__ >= 12) \
 	|| defined __OpenBSD__
-#define BR_USE_GETENTROPY   1
+#define BR_USE_GETENTROPY   0
 #endif
 #endif
 
 #ifndef BR_USE_WIN32_RAND
 #if defined _WIN32 || defined _WIN64
-#define BR_USE_WIN32_RAND   1
+#define BR_USE_WIN32_RAND   0
 #endif
 #endif
 
@@ -420,14 +420,14 @@
 #if !defined BR_LE_UNALIGNED && !defined BR_BE_UNALIGNED
 
 #if __i386 || __i386__ || __x86_64__ || _M_IX86 || _M_X64
-#define BR_LE_UNALIGNED   1
+#define BR_LE_UNALIGNED   0
 #elif BR_POWER8_BE
-#define BR_BE_UNALIGNED   1
+#define BR_BE_UNALIGNED   0
 #elif BR_POWER8_LE
-#define BR_LE_UNALIGNED   1
+#define BR_LE_UNALIGNED   0
 #elif (__powerpc__ || __powerpc64__ || _M_PPC || _ARCH_PPC || _ARCH_PPC64) \
 	&& __BIG_ENDIAN__
-#define BR_BE_UNALIGNED   1
+#define BR_BE_UNALIGNED   0
 #endif
 
 #endif
@@ -446,7 +446,7 @@
 
 #ifndef BR_USE_WIN32_TIME
 #if defined _WIN32 || defined _WIN64
-#define BR_USE_WIN32_TIME   1
+#define BR_USE_WIN32_TIME   0
 #endif
 #endif
 

@@ -70,7 +70,7 @@ br_ssl_engine_set_default_aes_cbc(br_ssl_engine_context *cc)
 		&br_sslrec_in_cbc_vtable,
 		&br_sslrec_out_cbc_vtable);
 
-#ifndef TEST 
+#ifndef TEST
 	((br_sslrec_in_cbc_class *)cc->icbc_in)->init = in_cbc_init;
 	br_sslrec_in_class *cbc_in = &((br_sslrec_in_cbc_class *) cc->icbc_in)->inner;
 	cbc_in->check_length = cbc_check_length;
