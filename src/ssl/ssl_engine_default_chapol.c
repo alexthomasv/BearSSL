@@ -24,6 +24,33 @@
 
 #include "inner.h"
 
+#ifndef TEST 
+static int
+chapol_check_length(const br_sslrec_chapol_context *cc, size_t rlen);
+
+static unsigned char *
+chapol_decrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static void
+in_chapol_init(br_sslrec_chapol_context *cc,
+	br_chacha20_run ichacha, br_poly1305_run ipoly,
+	const void *key, const void *iv);
+
+static void
+out_chapol_init(br_sslrec_chapol_context *cc,
+	br_chacha20_run ichacha, br_poly1305_run ipoly,
+	const void *key, const void *iv);
+
+static unsigned char *
+chapol_encrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static void
+chapol_max_plaintext(const br_sslrec_chapol_context *cc,
+	size_t *start, size_t *end);
+#endif
+
 /* see bearssl_ssl.h */
 void
 br_ssl_engine_set_default_chapol(br_ssl_engine_context *cc)
@@ -38,6 +65,19 @@ br_ssl_engine_set_default_chapol(br_ssl_engine_context *cc)
 	br_ssl_engine_set_chapol(cc,
 		&br_sslrec_in_chapol_vtable,
 		&br_sslrec_out_chapol_vtable);
+
+#ifndef TEST 
+	((br_sslrec_in_chapol_class *)cc->ichapol_in)->init = in_chapol_init;
+	br_sslrec_in_class *cbc_in = &((br_sslrec_in_chapol_class *) cc->ichapol_in)->inner;
+	cbc_in->check_length = chapol_check_length;
+	cbc_in->decrypt = chapol_decrypt;
+
+	((br_sslrec_out_chapol_class *)cc->ichapol_out)->init = out_chapol_init;
+	br_sslrec_out_class *cbc_out = &((br_sslrec_out_chapol_class *) cc->ichapol_out)->inner;
+	cbc_out->max_plaintext = chapol_max_plaintext;
+	cbc_out->encrypt = chapol_encrypt;
+#endif
+
 #if BR_SSE2
 	bc = br_chacha20_sse2_get();
 	if (bc) {

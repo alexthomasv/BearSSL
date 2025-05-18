@@ -30,8 +30,11 @@ br_hmac_drbg_init(br_hmac_drbg_context *ctx,
 	const br_hash_class *digest_class, const void *seed, size_t len)
 {
 	size_t hlen;
-
 	ctx->vtable = &br_hmac_drbg_vtable;
+	// Signal to boogie that we are using these functions
+	((br_prng_class *)ctx->vtable)->init = br_hmac_drbg_init;
+	((br_prng_class *)ctx->vtable)->generate = br_hmac_drbg_generate;
+	((br_prng_class *)ctx->vtable)->update = br_hmac_drbg_update;
 	hlen = br_digest_size(digest_class);
 	memset(ctx->K, 0x00, hlen);
 	memset(ctx->V, 0x01, hlen);

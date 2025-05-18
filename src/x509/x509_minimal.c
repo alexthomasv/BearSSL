@@ -217,6 +217,24 @@ void br_x509_minimal_run(void *ctx);
  */
 
 /* see bearssl_x509.h */
+static void
+xm_start_chain(const br_x509_class **ctx, const char *server_name);
+
+static void
+xm_start_cert(const br_x509_class **ctx, uint32_t length);
+
+static void
+xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len);
+
+static void
+xm_end_cert(const br_x509_class **ctx);
+
+static unsigned
+xm_end_chain(const br_x509_class **ctx);
+
+static const br_x509_pkey *
+xm_get_pkey(const br_x509_class *const *ctx, unsigned *usages);
+
 void
 br_x509_minimal_init(br_x509_minimal_context *ctx,
 	const br_hash_class *dn_hash_impl,
@@ -224,6 +242,14 @@ br_x509_minimal_init(br_x509_minimal_context *ctx,
 {
 	memset(ctx, 0, sizeof *ctx);
 	ctx->vtable = &br_x509_minimal_vtable;
+#ifndef TEST 
+	((br_x509_class *)ctx->vtable)->start_chain = &xm_start_chain;
+	((br_x509_class *)ctx->vtable)->start_cert = &xm_start_cert;
+	((br_x509_class *)ctx->vtable)->append = &xm_append;
+	((br_x509_class *)ctx->vtable)->end_cert = &xm_end_cert;
+	((br_x509_class *)ctx->vtable)->end_chain = &xm_end_chain;
+	((br_x509_class *)ctx->vtable)->get_pkey = &xm_get_pkey;
+#endif
 	ctx->dn_hash_impl = dn_hash_impl;
 	ctx->trust_anchors = trust_anchors;
 	ctx->trust_anchors_num = trust_anchors_num;

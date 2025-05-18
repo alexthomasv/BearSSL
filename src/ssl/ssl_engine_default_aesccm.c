@@ -24,6 +24,34 @@
 
 #include "inner.h"
 
+#ifndef TEST 
+static void
+in_ccm_init(br_sslrec_ccm_context *cc,
+	const br_block_ctrcbc_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+static void
+out_ccm_init(br_sslrec_ccm_context *cc,
+	const br_block_ctrcbc_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+static void
+ccm_max_plaintext(const br_sslrec_ccm_context *cc,
+	size_t *start, size_t *end);
+
+static unsigned char *
+ccm_encrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static unsigned char *
+ccm_decrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static int
+ccm_check_length(const br_sslrec_ccm_context *cc, size_t rlen);
+#endif
 /* see bearssl_ssl.h */
 void
 br_ssl_engine_set_default_aes_ccm(br_ssl_engine_context *cc)
@@ -35,6 +63,19 @@ br_ssl_engine_set_default_aes_ccm(br_ssl_engine_context *cc)
 	br_ssl_engine_set_ccm(cc,
 		&br_sslrec_in_ccm_vtable,
 		&br_sslrec_out_ccm_vtable);
+
+#ifndef TEST 
+	((br_sslrec_in_ccm_class *)cc->iccm_in)->init = in_ccm_init;
+	br_sslrec_in_class *inner_in = &((br_sslrec_in_ccm_class *)cc->iccm_in)->inner;
+	inner_in->check_length = ccm_check_length;
+	inner_in->decrypt = ccm_decrypt;
+
+	((br_sslrec_out_ccm_class *)cc->iccm_out)->init = out_ccm_init;
+	br_sslrec_out_class *inner_out = &((br_sslrec_out_ccm_class *)cc->iccm_out)->inner;
+	inner_out->max_plaintext = ccm_max_plaintext;
+	inner_out->encrypt = ccm_encrypt;
+#endif
+
 #if BR_AES_X86NI
 	ictrcbc = br_aes_x86ni_ctrcbc_get_vtable();
 	if (ictrcbc != NULL) {

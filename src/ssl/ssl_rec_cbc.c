@@ -24,6 +24,13 @@
 
 #include "inner.h"
 
+static int
+cbc_check_length(const br_sslrec_in_cbc_context *cc, size_t rlen);
+
+static unsigned char *
+cbc_decrypt(br_sslrec_in_cbc_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
 static void
 in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const br_block_cbcdec_class *bc_impl,
@@ -33,6 +40,10 @@ in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const void *iv)
 {
 	cc->vtable = &br_sslrec_in_cbc_vtable;
+	((br_sslrec_in_cbc_class *)cc->vtable)->init = in_cbc_init;
+	br_sslrec_in_class *cbc = &((br_sslrec_in_cbc_class *) cc->vtable)->inner;
+	cbc->check_length = cbc_check_length;
+	cbc->decrypt = cbc_decrypt;
 	cc->seq = 0;
 	bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
 	br_hmac_key_init(&cc->mac, dig_impl, mac_key, mac_key_len);

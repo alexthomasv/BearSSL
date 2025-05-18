@@ -280,7 +280,7 @@
  */
 #ifndef BR_AES_X86NI
 #if (BR_i386 || BR_amd64) && (BR_GCC_4_8 || BR_CLANG_3_7 || BR_MSC_2012)
-#define BR_AES_X86NI   1
+#define BR_AES_X86NI   0
 #endif
 #endif
 
@@ -290,7 +290,7 @@
  */
 #ifndef BR_SSE2
 #if (BR_i386 || BR_amd64) && (BR_GCC_4_4 || BR_CLANG_3_7 || BR_MSC_2005)
-#define BR_SSE2   1
+#define BR_SSE2   0
 #endif
 #endif
 
@@ -300,7 +300,7 @@
  */
 #ifndef BR_RDRAND
 #if (BR_i386 || BR_amd64) && (BR_GCC_4_6 || BR_CLANG_3_7 || BR_MSC_2012)
-#define BR_RDRAND   1
+#define BR_RDRAND   0
 #endif
 #endif
 
@@ -402,7 +402,7 @@
  */
 #if !defined BR_INT128 && !defined BR_UMUL128
 #ifdef __SIZEOF_INT128__
-#define BR_INT128    1
+#define BR_INT128    0
 #elif _M_X64
 #define BR_UMUL128   1
 #endif
@@ -440,7 +440,7 @@
 #if defined __unix__ || defined __linux__ \
 	|| defined _POSIX_SOURCE || defined _POSIX_C_SOURCE \
 	|| (defined __APPLE__ && defined __MACH__)
-#define BR_USE_UNIX_TIME   1
+#define BR_USE_UNIX_TIME   0
 #endif
 #endif
 

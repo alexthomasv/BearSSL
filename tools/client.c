@@ -1039,6 +1039,16 @@ do_client(int argc, char *argv[])
 
 	if (chain != NULL) {
 		zc.vtable = &ccert_vtable;
+		((br_ssl_client_certificate_class *)zc.vtable)->start_name_list = cc_start_name_list;
+		((br_ssl_client_certificate_class *)zc.vtable)->start_name = cc_start_name;
+		((br_ssl_client_certificate_class *)zc.vtable)->append_name = cc_append_name;
+		((br_ssl_client_certificate_class *)zc.vtable)->end_name = cc_end_name;
+		((br_ssl_client_certificate_class *)zc.vtable)->end_name_list = cc_end_name_list;
+		((br_ssl_client_certificate_class *)zc.vtable)->choose = cc_choose;
+		((br_ssl_client_certificate_class *)zc.vtable)->do_keyx = cc_do_keyx;
+		((br_ssl_client_certificate_class *)zc.vtable)->do_sign = cc_do_sign;
+		
+
 		zc.verbose = verbose;
 		zc.chain = chain;
 		zc.chain_len = chain_len;
@@ -1052,6 +1062,14 @@ do_client(int argc, char *argv[])
 			}
 		}
 		br_ssl_client_set_client_certificate(&cc, &zc.vtable);
+		(*cc.client_auth.vtable)->start_name_list = cc_start_name_list;
+		(*cc.client_auth.vtable)->start_name = cc_start_name;
+		(*cc.client_auth.vtable)->append_name = cc_append_name;
+		(*cc.client_auth.vtable)->end_name = cc_end_name;
+		(*cc.client_auth.vtable)->end_name_list = cc_end_name_list;
+		(*cc.client_auth.vtable)->choose = cc_choose;
+		(*cc.client_auth.vtable)->do_keyx = cc_do_keyx;
+		(*cc.client_auth.vtable)->do_sign = cc_do_sign;
 	}
 
 	br_ssl_engine_set_buffer(&cc.eng, iobuf, iobuf_len, bidi);

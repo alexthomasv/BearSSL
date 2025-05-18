@@ -24,6 +24,37 @@
 
 #include "inner.h"
 
+#ifndef TEST 
+static void
+in_gcm_init(br_sslrec_gcm_context *cc,
+	const br_block_ctr_class *bc_impl,
+	const void *key, size_t key_len,
+	br_ghash gh_impl,
+	const void *iv);
+
+static void
+out_gcm_init(br_sslrec_gcm_context *cc,
+	const br_block_ctr_class *bc_impl,
+	const void *key, size_t key_len,
+	br_ghash gh_impl,
+	const void *iv);
+
+static void
+gcm_max_plaintext(const br_sslrec_gcm_context *cc,
+	size_t *start, size_t *end);
+
+static unsigned char *
+gcm_encrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+static int
+gcm_check_length(const br_sslrec_gcm_context *cc, size_t rlen);
+
+static unsigned char *
+gcm_decrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+#endif
+
 /* see bearssl_ssl.h */
 void
 br_ssl_engine_set_default_aes_gcm(br_ssl_engine_context *cc)
@@ -36,6 +67,18 @@ br_ssl_engine_set_default_aes_gcm(br_ssl_engine_context *cc)
 	br_ssl_engine_set_gcm(cc,
 		&br_sslrec_in_gcm_vtable,
 		&br_sslrec_out_gcm_vtable);
+#ifndef TEST 
+	((br_sslrec_in_gcm_class *)cc->igcm_in)->init = in_gcm_init;
+	br_sslrec_in_class *inner_in = &((br_sslrec_in_gcm_class *)cc->igcm_in)->inner;
+	inner_in->check_length = gcm_check_length;
+	inner_in->decrypt = gcm_decrypt;
+
+	((br_sslrec_out_gcm_class *)cc->igcm_out)->init = out_gcm_init;
+	br_sslrec_out_class *inner_out = &((br_sslrec_out_gcm_class *)cc->igcm_out)->inner;
+	inner_out->max_plaintext = gcm_max_plaintext;
+	inner_out->encrypt = gcm_encrypt;
+#endif
+
 #if BR_AES_X86NI
 	ictr = br_aes_x86ni_ctr_get_vtable();
 	if (ictr != NULL) {

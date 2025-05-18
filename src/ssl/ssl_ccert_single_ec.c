@@ -145,6 +145,14 @@ br_ssl_client_set_single_ec(br_ssl_client_context *cc,
 	const br_ec_impl *iec, br_ecdsa_sign iecdsa)
 {
 	cc->client_auth.single_ec.vtable = &ccert_vtable;
+	// cc->client_auth.single_ec.vtable->start_name_list = cc_start_name_list;
+	// cc->client_auth.single_ec.vtable->start_name = cc_start_name;
+	// cc->client_auth.single_ec.vtable->append_name = cc_append_name;
+	// cc->client_auth.single_ec.vtable->end_name = cc_end_name;
+	// cc->client_auth.single_ec.vtable->end_name_list = cc_end_name_list;
+	// cc->client_auth.single_ec.vtable->choose = cc_choose;
+	// cc->client_auth.single_ec.vtable->do_keyx = cc_do_keyx;
+	// cc->client_auth.single_ec.vtable->do_sign = cc_do_sign;
 	cc->client_auth.single_ec.chain = chain;
 	cc->client_auth.single_ec.chain_len = chain_len;
 	cc->client_auth.single_ec.sk = sk;

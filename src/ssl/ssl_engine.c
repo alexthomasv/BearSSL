@@ -282,6 +282,13 @@
 #define MAX_OUT_OVERHEAD    85
 #define MAX_IN_OVERHEAD    325
 
+static void
+clear_max_plaintext(const br_sslrec_out_clear_context *cc,
+	size_t *start, size_t *end);
+static unsigned char *
+clear_encrypt(br_sslrec_out_clear_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);	
+
 /* see inner.h */
 void
 br_ssl_engine_fail(br_ssl_engine_context *rc, int err)
@@ -447,6 +454,11 @@ br_ssl_engine_set_buffers_bidi(br_ssl_engine_context *rc,
 		rc->peer_log_max_frag_len = 0;
 	}
 	rc->out.vtable = &br_sslrec_out_clear_vtable;
+#ifndef TEST 
+	((br_sslrec_out_class *)rc->out.vtable)->max_plaintext = clear_max_plaintext;
+	((br_sslrec_out_class *)rc->out.vtable)->encrypt = clear_encrypt;
+#endif
+
 	make_ready_in(rc);
 	make_ready_out(rc);
 }
@@ -495,8 +507,26 @@ rng_init(br_ssl_engine_context *cc)
 			if (!h) {
 				br_ssl_engine_fail(cc, BR_ERR_BAD_STATE);
 				return 0;
+			} else {
+				((br_hash_class *)h)->init = br_sha1_init;
+				((br_hash_class *)h)->update = br_sha1_update;
+				((br_hash_class *)h)->out = br_sha1_out;
+				((br_hash_class *)h)->state = br_sha1_state;
+				((br_hash_class *)h)->set_state = br_sha1_set_state;
 			}
+		} else {
+			((br_hash_class *)h)->init = br_sha384_init;
+			((br_hash_class *)h)->update = br_sha384_update;
+			((br_hash_class *)h)->out = br_sha384_out;
+			((br_hash_class *)h)->state = br_sha384_state;
+			((br_hash_class *)h)->set_state = br_sha384_set_state;
 		}
+	} else{
+		((br_hash_class *)h)->init = br_sha256_init;
+		((br_hash_class *)h)->update = br_sha256_update;
+		((br_hash_class *)h)->out = br_sha256_out;
+		((br_hash_class *)h)->state = br_sha256_state;
+		((br_hash_class *)h)->set_state = br_sha256_set_state;
 	}
 	br_hmac_drbg_init(&cc->rng, h, NULL, 0);
 	cc->rng_init_done = 1;
