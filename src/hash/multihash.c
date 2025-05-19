@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * An aggregate context that is large enough for all supported hash
@@ -94,8 +95,8 @@ br_multihash_init(br_multihash_context *ctx)
 		if (hc != NULL) {
 			gen_hash_context g;
 
-			generic_init(hc->init, &g.vtable);
-			generic_state(hc->state, &g.vtable,
+			generic_hash_init(hc->init, &g.vtable);
+			generic_hash_state(hc->state, &g.vtable,
 				(unsigned char *)ctx + get_state_offset(i));
 			// hc->init(&g.vtable);
 			// hc->state(&g.vtable,

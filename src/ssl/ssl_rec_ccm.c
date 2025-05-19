@@ -52,7 +52,7 @@ in_ccm_init(br_sslrec_ccm_context *cc,
 	gen_ccm_init(cc, bc_impl, key, key_len, iv, tag_len);
 }
 
-static int
+int
 ccm_check_length(const br_sslrec_ccm_context *cc, size_t rlen)
 {
 	/*
@@ -65,7 +65,7 @@ ccm_check_length(const br_sslrec_ccm_context *cc, size_t rlen)
 	return rlen >= over && rlen <= (16384 + over);
 }
 
-static unsigned char *
+unsigned char *
 ccm_decrypt(br_sslrec_ccm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
@@ -146,7 +146,7 @@ ccm_max_plaintext(const br_sslrec_ccm_context *cc,
 	*end = *start + len;
 }
 
-static unsigned char *
+unsigned char *
 ccm_encrypt(br_sslrec_ccm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {

@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * Implementation Notes
@@ -95,7 +96,7 @@ br_ccm_reset(br_ccm_context *ctx, const void *nonce, size_t nonce_len,
 	 */
 	memset(ctx->cbcmac, 0, sizeof ctx->cbcmac);
 	// (*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac, tmp, sizeof tmp);
-	generic_mac((*ctx->bctx)->mac, ctx->cbcmac, tmp, sizeof tmp);
+	g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, tmp, sizeof tmp);
 	/*
 	 * Assemble AAD length header.
 	 */
@@ -123,7 +124,8 @@ br_ccm_reset(br_ccm_context *ctx, const void *nonce, size_t nonce_len,
 	memcpy(ctx->ctr + 1, nonce, nonce_len);
 	memset(ctx->ctr + 1 + nonce_len, 0, q);
 	memset(ctx->tagmask, 0, sizeof ctx->tagmask);
-	generic_ctr((*ctx->bctx)->ctr, ctx->ctr, ctx->tagmask, sizeof ctx->tagmask);
+	g_br_block_ctr((*ctx->bctx)->ctr, ctx->bctx, ctx->ctr,
+		ctx->tagmask, sizeof ctx->tagmask);
 	// (*ctx->bctx)->ctr(ctx->bctx, ctx->ctr,
 	// 	ctx->tagmask, sizeof ctx->tagmask);
 
@@ -262,12 +264,12 @@ br_ccm_run(br_ccm_context *ctx, int encrypt, void *data, size_t len)
 	ptr = len & 15;
 	len -= ptr;
 	if (encrypt) {
-		generic_enc_dec((*ctx->bctx)->decrypt, ctx->bctx, ctx->ctr, ctx->cbcmac,
+		g_br_block_decrypt((*ctx->bctx)->decrypt, ctx->bctx, ctx->ctr, ctx->cbcmac,
 			dbuf, len);
 		// (*ctx->bctx)->decrypt(ctx->bctx, ctx->ctr, ctx->cbcmac,
 		// 	dbuf, len);
 	} else {
-		generic_enc_enc((*ctx->bctx)->encrypt, ctx->bctx, ctx->ctr, ctx->cbcmac,
+		g_br_block_encrypt((*ctx->bctx)->encrypt, ctx->bctx, ctx->ctr, ctx->cbcmac,
 			dbuf, len);
 		// (*ctx->bctx)->encrypt(ctx->bctx, ctx->ctr, ctx->cbcmac,
 		// 	dbuf, len);

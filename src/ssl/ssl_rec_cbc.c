@@ -24,13 +24,6 @@
 
 #include "inner.h"
 
-static int
-cbc_check_length(const br_sslrec_in_cbc_context *cc, size_t rlen);
-
-static unsigned char *
-cbc_decrypt(br_sslrec_in_cbc_context *cc,
-	int record_type, unsigned version, void *data, size_t *data_len);
-
 static void
 in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const br_block_cbcdec_class *bc_impl,
@@ -40,10 +33,6 @@ in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const void *iv)
 {
 	cc->vtable = &br_sslrec_in_cbc_vtable;
-	((br_sslrec_in_cbc_class *)cc->vtable)->init = in_cbc_init;
-	br_sslrec_in_class *cbc = &((br_sslrec_in_cbc_class *) cc->vtable)->inner;
-	cbc->check_length = cbc_check_length;
-	cbc->decrypt = cbc_decrypt;
 	cc->seq = 0;
 	// bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
 	generic_enc_init(bc_impl->init, &cc->bc.vtable, bc_key, bc_key_len);
@@ -58,7 +47,7 @@ in_cbc_init(br_sslrec_in_cbc_context *cc,
 	}
 }
 
-static int
+int
 cbc_check_length(const br_sslrec_in_cbc_context *cc, size_t rlen)
 {
 	/*
@@ -106,7 +95,7 @@ cond_rotate(uint32_t ctl, unsigned char *buf, size_t len, size_t num)
 	memcpy(buf, tmp, len);
 }
 
-static unsigned char *
+unsigned char *
 cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
@@ -134,7 +123,7 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * which is useless but harmless.
 	 */
 	// cc->bc.vtable->run(&cc->bc.vtable, cc->iv, data, len);
-	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, data, len);
+	g_br_block_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, data, len);
 	if (cc->explicit_IV) {
 		buf += blen;
 		len -= blen;
@@ -320,7 +309,7 @@ cbc_max_plaintext(const br_sslrec_out_cbc_context *cc,
 	*end = *start + len;
 }
 
-static unsigned char *
+unsigned char *
 cbc_encrypt(br_sslrec_out_cbc_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
@@ -424,7 +413,7 @@ cbc_encrypt(br_sslrec_out_cbc_context *cc,
 	 * block is still a uniformly random block).
 	 */
 	// cc->bc.vtable->run(&cc->bc.vtable, cc->iv, buf, len);
-	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, buf, len);
+	g_br_block_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, buf, len);
 	/*
 	 * Add the header and return.
 	 */

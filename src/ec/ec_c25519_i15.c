@@ -365,8 +365,8 @@ api_mulgen(unsigned char *R,
 	return Glen;
 }
 
-static uint32_t
-api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+uint32_t
+ec_c_25519_i15_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
 {
@@ -394,5 +394,5 @@ const br_ec_impl br_ec_c25519_i15 = {
 	&api_xoff,
 	&api_mul,
 	&api_mulgen,
-	&api_muladd
+	&ec_c_25519_i15_api_muladd
 };

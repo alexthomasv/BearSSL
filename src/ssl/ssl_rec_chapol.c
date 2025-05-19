@@ -71,7 +71,7 @@ in_chapol_init(br_sslrec_chapol_context *cc,
 	gen_chapol_init(cc, ichacha, ipoly, key, iv);
 }
 
-static int
+int
 chapol_check_length(const br_sslrec_chapol_context *cc, size_t rlen)
 {
 	/*
@@ -81,7 +81,7 @@ chapol_check_length(const br_sslrec_chapol_context *cc, size_t rlen)
 	return rlen >= 16 && rlen <= (16384 + 16);
 }
 
-static unsigned char *
+unsigned char *
 chapol_decrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
@@ -143,7 +143,7 @@ chapol_max_plaintext(const br_sslrec_chapol_context *cc,
 	*end = *start + len;
 }
 
-static unsigned char *
+unsigned char *
 chapol_encrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {

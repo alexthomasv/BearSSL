@@ -2062,8 +2062,8 @@ api_mulgen(unsigned char *R,
 	return 65;
 }
 
-static uint32_t
-api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+uint32_t
+ec_p_256_m15_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
 {
@@ -2120,5 +2120,5 @@ const br_ec_impl br_ec_p256_m15 = {
 	&api_xoff,
 	&api_mul,
 	&api_mulgen,
-	&api_muladd
+	&ec_p_256_m15_api_muladd
 };
