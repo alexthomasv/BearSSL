@@ -62,7 +62,7 @@ gen_chapol_process(br_sslrec_chapol_context *cc,
 		// tag, cc->ichacha, encrypt);
 }
 
-static void
+void
 in_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
 	const void *key, const void *iv)
@@ -120,7 +120,7 @@ const br_sslrec_in_chapol_class br_sslrec_in_chapol_vtable = {
 		&in_chapol_init
 };
 
-static void
+void
 out_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
 	const void *key, const void *iv)

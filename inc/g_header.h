@@ -124,4 +124,50 @@ uint32_t generic_irsa(void *fn_ptr,
         const br_ec_public_key *pk,
         const void *sig, size_t sig_len);
 
+
+// Needed for ssl_engine.c
+extern void in_ccm_init(br_sslrec_ccm_context *cc,
+	const br_block_ctrcbc_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+extern void out_ccm_init(br_sslrec_ccm_context *cc,
+	const br_block_ctrcbc_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+extern void in_gcm_init(br_sslrec_gcm_context *cc,
+	const br_block_ctr_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+extern void out_gcm_init(br_sslrec_gcm_context *cc,
+	const br_block_ctr_class *bc_impl,
+	const void *key, size_t key_len,
+	const void *iv, size_t tag_len);
+
+extern void in_cbc_init(br_sslrec_in_cbc_context *cc,
+	const br_block_cbcdec_class *bc_impl,
+	const void *bc_key, size_t bc_key_len,
+	const br_hash_class *dig_impl,
+	const void *mac_key, size_t mac_key_len, size_t mac_out_len,
+	const void *iv);
+
+extern void out_cbc_init(br_sslrec_out_cbc_context *cc,
+	const br_block_cbcenc_class *bc_impl,
+	const void *bc_key, size_t bc_key_len,
+	const br_hash_class *dig_impl,
+	const void *mac_key, size_t mac_key_len, size_t mac_out_len,
+	const void *iv);
+
+extern void
+in_chapol_init(br_sslrec_chapol_context *cc,
+	br_chacha20_run ichacha, br_poly1305_run ipoly,
+	const void *key, const void *iv);
+
+extern void
+out_chapol_init(br_sslrec_chapol_context *cc,
+	br_chacha20_run ichacha, br_poly1305_run ipoly,
+	const void *key, const void *iv);
+
 #endif /* GENERIC_WRAPPERS_H */

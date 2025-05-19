@@ -698,8 +698,8 @@ id_to_curve_def(int curve)
 	return NULL;
 }
 
-static const unsigned char *
-api_generator(int curve, size_t *len)
+const unsigned char *
+ec_prime_i31_api_generator(int curve, size_t *len)
 {
 	const br_ec_curve_def *cd;
 
@@ -708,8 +708,8 @@ api_generator(int curve, size_t *len)
 	return cd->generator;
 }
 
-static const unsigned char *
-api_order(int curve, size_t *len)
+const unsigned char *
+ec_prime_i31_api_order(int curve, size_t *len)
 {
 	const br_ec_curve_def *cd;
 
@@ -718,16 +718,16 @@ api_order(int curve, size_t *len)
 	return cd->order;
 }
 
-static size_t
-api_xoff(int curve, size_t *len)
+size_t
+ec_prime_i31_api_xoff(int curve, size_t *len)
 {
-	api_generator(curve, len);
+	ec_prime_i31_api_generator(curve, len);
 	*len >>= 1;
 	return 1;
 }
 
-static uint32_t
-api_mul(unsigned char *G, size_t Glen,
+uint32_t
+ec_prime_i31_api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	uint32_t r;
@@ -744,16 +744,16 @@ api_mul(unsigned char *G, size_t Glen,
 	return r;
 }
 
-static size_t
-api_mulgen(unsigned char *R,
+size_t
+ec_prime_i31_api_mulgen(unsigned char *R,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	const unsigned char *G;
 	size_t Glen;
 
-	G = api_generator(curve, &Glen);
+	G = ec_prime_i31_api_generator(curve, &Glen);
 	memcpy(R, G, Glen);
-	api_mul(R, Glen, x, xlen, curve);
+	ec_prime_i31_api_mul(R, Glen, x, xlen, curve);
 	return Glen;
 }
 
@@ -780,7 +780,7 @@ ec_prime_i31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	if (B == NULL) {
 		size_t Glen;
 
-		B = api_generator(curve, &Glen);
+		B = ec_prime_i31_api_generator(curve, &Glen);
 	}
 	r &= point_decode(&Q, B, len, cc);
 	point_mul(&P, x, xlen, cc);
@@ -817,10 +817,10 @@ ec_prime_i31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_prime_i31 = {
 	(uint32_t)0x03800000,
-	&api_generator,
-	&api_order,
-	&api_xoff,
-	&api_mul,
-	&api_mulgen,
+	&ec_prime_i31_api_generator,
+	&ec_prime_i31_api_order,
+	&ec_prime_i31_api_xoff,
+	&ec_prime_i31_api_mul,
+	&ec_prime_i31_api_mulgen,
 	&ec_prime_i31_api_muladd
 };

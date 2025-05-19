@@ -1352,32 +1352,32 @@ static const unsigned char P256_N[] = {
 	0x25, 0x51
 };
 
-static const unsigned char *
-api_generator(int curve, size_t *len)
+const unsigned char *
+ec_p_256_m31_api_generator(int curve, size_t *len)
 {
 	(void)curve;
 	*len = sizeof P256_G;
 	return P256_G;
 }
 
-static const unsigned char *
-api_order(int curve, size_t *len)
+const unsigned char *
+ec_p_256_m31_api_order(int curve, size_t *len)
 {
 	(void)curve;
 	*len = sizeof P256_N;
 	return P256_N;
 }
 
-static size_t
-api_xoff(int curve, size_t *len)
+size_t
+ec_p_256_m31_api_xoff(int curve, size_t *len)
 {
 	(void)curve;
 	*len = 32;
 	return 1;
 }
 
-static uint32_t
-api_mul(unsigned char *G, size_t Glen,
+uint32_t
+ec_p_256_m31_api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	uint32_t r;
@@ -1394,8 +1394,8 @@ api_mul(unsigned char *G, size_t Glen,
 	return r;
 }
 
-static size_t
-api_mulgen(unsigned char *R,
+size_t
+ec_p_256_m31_api_mulgen(unsigned char *R,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	p256_jacobian P;
@@ -1460,10 +1460,10 @@ ec_p_256_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_p256_m31 = {
 	(uint32_t)0x00800000,
-	&api_generator,
-	&api_order,
-	&api_xoff,
-	&api_mul,
-	&api_mulgen,
+	&ec_p_256_m31_api_generator,
+	&ec_p_256_m31_api_order,
+	&ec_p_256_m31_api_xoff,
+	&ec_p_256_m31_api_mul,
+	&ec_p_256_m31_api_mulgen,
 	&ec_p_256_m31_api_muladd
 };

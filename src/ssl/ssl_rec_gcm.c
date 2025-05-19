@@ -49,7 +49,7 @@ gen_gcm_init(br_sslrec_gcm_context *cc,
 	g_br_block_run(bc_impl->run, &cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
 }
 
-static void
+void
 in_gcm_init(br_sslrec_gcm_context *cc,
 	const br_block_ctr_class *bc_impl,
 	const void *key, size_t key_len,
@@ -172,7 +172,7 @@ const br_sslrec_in_gcm_class br_sslrec_in_gcm_vtable = {
 		&in_gcm_init
 };
 
-static void
+void
 out_gcm_init(br_sslrec_gcm_context *cc,
 	const br_block_ctr_class *bc_impl,
 	const void *key, size_t key_len,

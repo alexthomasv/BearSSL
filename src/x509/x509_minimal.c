@@ -242,14 +242,6 @@ br_x509_minimal_init(br_x509_minimal_context *ctx,
 {
 	memset(ctx, 0, sizeof *ctx);
 	ctx->vtable = &br_x509_minimal_vtable;
-#ifndef TEST 
-	((br_x509_class *)ctx->vtable)->start_chain = &xm_start_chain;
-	((br_x509_class *)ctx->vtable)->start_cert = &xm_start_cert;
-	((br_x509_class *)ctx->vtable)->append = &xm_append;
-	((br_x509_class *)ctx->vtable)->end_cert = &xm_end_cert;
-	((br_x509_class *)ctx->vtable)->end_chain = &xm_end_chain;
-	((br_x509_class *)ctx->vtable)->get_pkey = &xm_get_pkey;
-#endif
 	ctx->dn_hash_impl = dn_hash_impl;
 	ctx->trust_anchors = trust_anchors;
 	ctx->trust_anchors_num = trust_anchors_num;
@@ -382,9 +374,13 @@ static void
 hash_dn(br_x509_minimal_context *ctx, const void *dn, size_t len,
 	unsigned char *out)
 {
-	ctx->dn_hash_impl->init(&ctx->dn_hash.vtable);
-	ctx->dn_hash_impl->update(&ctx->dn_hash.vtable, dn, len);
-	ctx->dn_hash_impl->out(&ctx->dn_hash.vtable, out);
+	// ctx->dn_hash_impl->init(&ctx->dn_hash.vtable);
+	// ctx->dn_hash_impl->update(&ctx->dn_hash.vtable, dn, len);
+	// ctx->dn_hash_impl->out(&ctx->dn_hash.vtable, out);
+
+	br_hash_dn_init(ctx->dn_hash_impl->init, &ctx->dn_hash.vtable);
+	br_hash_dn_update(ctx->dn_hash_impl->update, &ctx->dn_hash.vtable, dn, len);
+	br_hash_dn_out(ctx->dn_hash_impl->out, &ctx->dn_hash.vtable, out);
 }
 
 /*
@@ -1282,7 +1278,8 @@ br_x509_minimal_run(void *t0ctx)
 			case 27: {
 				/* compute-dn-hash */
 
-	CTX->dn_hash_impl->out(&CTX->dn_hash.vtable, CTX->current_dn_hash);
+	// CTX->dn_hash_impl->out(&CTX->dn_hash.vtable, CTX->current_dn_hash);
+	br_hash_dn_out(CTX->dn_hash_impl->out, &CTX->dn_hash.vtable, CTX->current_dn_hash);
 	CTX->do_dn_hash = 0;
 
 				}
@@ -1589,8 +1586,9 @@ br_x509_minimal_run(void *t0ctx)
 		br_multihash_update(&CTX->mhash, CTX->hbuf, clen);
 	}
 	if (CTX->do_dn_hash) {
-		CTX->dn_hash_impl->update(
-			&CTX->dn_hash.vtable, CTX->hbuf, clen);
+		// CTX->dn_hash_impl->update(
+		// 	&CTX->dn_hash.vtable, CTX->hbuf, clen);
+		br_hash_dn_update(CTX->dn_hash_impl->update, &CTX->dn_hash.vtable, CTX->hbuf, clen);
 	}
 	CTX->hbuf += clen;
 	CTX->hlen -= clen;
@@ -1610,7 +1608,8 @@ br_x509_minimal_run(void *t0ctx)
 			br_multihash_update(&CTX->mhash, &x, 1);
 		}
 		if (CTX->do_dn_hash) {
-			CTX->dn_hash_impl->update(&CTX->dn_hash.vtable, &x, 1);
+			// CTX->dn_hash_impl->update(&CTX->dn_hash.vtable, &x, 1);
+			br_hash_dn_update(CTX->dn_hash_impl->update, &CTX->dn_hash.vtable, &x, 1);
 		}
 		CTX->hlen --;
 		T0_PUSH(x);
@@ -1650,7 +1649,8 @@ br_x509_minimal_run(void *t0ctx)
 			case 55: {
 				/* start-dn-hash */
 
-	CTX->dn_hash_impl->init(&CTX->dn_hash.vtable);
+	br_hash_dn_init(CTX->dn_hash_impl->init, &CTX->dn_hash.vtable);
+	// CTX->dn_hash_impl->init(&CTX->dn_hash.vtable);
 	CTX->do_dn_hash = 1;
 
 				}
@@ -1717,7 +1717,10 @@ verify_signature(br_x509_minimal_context *ctx, const br_x509_pkey *pk)
 		if (ctx->irsa == 0) {
 			return BR_ERR_X509_UNSUPPORTED;
 		}
-		if (!ctx->irsa(ctx->cert_sig, ctx->cert_sig_len,
+		// if (!ctx->irsa(ctx->cert_sig, ctx->cert_sig_len,
+		// 	&t0_datablock[ctx->cert_sig_hash_oid],
+		// 	ctx->cert_sig_hash_len, &pk->key.rsa, tmp))
+		if (!g_irsa(ctx->irsa, ctx->cert_sig, ctx->cert_sig_len,
 			&t0_datablock[ctx->cert_sig_hash_oid],
 			ctx->cert_sig_hash_len, &pk->key.rsa, tmp))
 		{
@@ -1732,7 +1735,10 @@ verify_signature(br_x509_minimal_context *ctx, const br_x509_pkey *pk)
 		if (ctx->iecdsa == 0) {
 			return BR_ERR_X509_UNSUPPORTED;
 		}
-		if (!ctx->iecdsa(ctx->iec, ctx->tbs_hash,
+		// if (!ctx->iecdsa(ctx->iec, ctx->tbs_hash,
+		// 	ctx->cert_sig_hash_len, &pk->key.ec,
+		// 	ctx->cert_sig, ctx->cert_sig_len))
+		if (!g_iecdsa(ctx->iecdsa, ctx->iec, ctx->tbs_hash,
 			ctx->cert_sig_hash_len, &pk->key.ec,
 			ctx->cert_sig, ctx->cert_sig_len))
 		{

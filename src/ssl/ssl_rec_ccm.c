@@ -29,7 +29,7 @@
  * which depends on whether this is a context for encrypting or for
  * decrypting.
  */
-static void
+void
 gen_ccm_init(br_sslrec_ccm_context *cc,
 	const br_block_ctrcbc_class *bc_impl,
 	const void *key, size_t key_len,
@@ -42,7 +42,7 @@ gen_ccm_init(br_sslrec_ccm_context *cc,
 	cc->tag_len = tag_len;
 }
 
-static void
+void
 in_ccm_init(br_sslrec_ccm_context *cc,
 	const br_block_ctrcbc_class *bc_impl,
 	const void *key, size_t key_len,
@@ -122,7 +122,7 @@ const br_sslrec_in_ccm_class br_sslrec_in_ccm_vtable = {
 		&in_ccm_init
 };
 
-static void
+void
 out_ccm_init(br_sslrec_ccm_context *cc,
 	const br_block_ctrcbc_class *bc_impl,
 	const void *key, size_t key_len,

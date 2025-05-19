@@ -24,7 +24,7 @@
 
 #include "inner.h"
 
-static void
+void
 in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const br_block_cbcdec_class *bc_impl,
 	const void *bc_key, size_t bc_key_len,
@@ -266,7 +266,7 @@ const br_sslrec_in_cbc_class br_sslrec_in_cbc_vtable = {
  * need to leave some room in the buffer for that extra record.
  */
 
-static void
+void
 out_cbc_init(br_sslrec_out_cbc_context *cc,
 	const br_block_cbcenc_class *bc_impl,
 	const void *bc_key, size_t bc_key_len,

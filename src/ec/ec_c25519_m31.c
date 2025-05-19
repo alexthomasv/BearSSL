@@ -577,24 +577,24 @@ static const unsigned char ORDER[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-static const unsigned char *
-api_generator(int curve, size_t *len)
+const unsigned char *
+ec_c_25519_m31_api_generator(int curve, size_t *len)
 {
 	(void)curve;
 	*len = 32;
 	return GEN;
 }
 
-static const unsigned char *
-api_order(int curve, size_t *len)
+const unsigned char *
+ec_c_25519_m31_api_order(int curve, size_t *len)
 {
 	(void)curve;
 	*len = 32;
 	return ORDER;
 }
 
-static size_t
-api_xoff(int curve, size_t *len)
+size_t
+ec_c_25519_m31_api_xoff(int curve, size_t *len)
 {
 	(void)curve;
 	*len = 32;
@@ -618,8 +618,8 @@ cswap(uint32_t *a, uint32_t *b, uint32_t ctl)
 	}
 }
 
-static uint32_t
-api_mul(unsigned char *G, size_t Glen,
+uint32_t
+ec_c_25519_m31_api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
 	uint32_t x1[9], x2[9], x3[9], z2[9], z3[9];
@@ -754,16 +754,16 @@ api_mul(unsigned char *G, size_t Glen,
 	return 1;
 }
 
-static size_t
-api_mulgen(unsigned char *R,
+size_t
+ec_c_25519_m31_api_mulgen(unsigned char *R,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	const unsigned char *G;
 	size_t Glen;
 
-	G = api_generator(curve, &Glen);
+	G = ec_c_25519_m31_api_generator(curve, &Glen);
 	memcpy(R, G, Glen);
-	api_mul(R, Glen, x, xlen, curve);
+	ec_c_25519_m31_api_mul(R, Glen, x, xlen, curve);
 	return Glen;
 }
 
@@ -791,10 +791,10 @@ ec_c_25519_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_c25519_m31 = {
 	(uint32_t)0x20000000,
-	&api_generator,
-	&api_order,
-	&api_xoff,
-	&api_mul,
-	&api_mulgen,
+	&ec_c_25519_m31_api_generator,
+	&ec_c_25519_m31_api_order,
+	&ec_c_25519_m31_api_xoff,
+	&ec_c_25519_m31_api_mul,
+	&ec_c_25519_m31_api_mulgen,
 	&ec_c_25519_m31_api_muladd
 };

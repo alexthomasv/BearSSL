@@ -1263,8 +1263,8 @@ api_generator(int curve, size_t *len)
 	return GEN;
 }
 
-static const unsigned char *
-api_order(int curve, size_t *len)
+const unsigned char *
+ec_c_25519_m15_api_order(int curve, size_t *len)
 {
 	(void)curve;
 	*len = 32;
@@ -1470,7 +1470,7 @@ ec_c_25519_m15_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 const br_ec_impl br_ec_c25519_m15 = {
 	(uint32_t)0x20000000,
 	&api_generator,
-	&api_order,
+	&ec_c_25519_m15_api_order,
 	&api_xoff,
 	&api_mul,
 	&api_mulgen,

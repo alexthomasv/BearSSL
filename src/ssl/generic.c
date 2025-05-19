@@ -340,7 +340,7 @@ uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char 
 	}
 }
 
-uint32_t generic_irsa(void *fn_pointer, const br_ec_impl *impl,
+uint32_t g_iecdsa(void *fn_pointer, const br_ec_impl *impl,
 	const void *hash, size_t hash_len,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len){
 	if (fn_pointer == &br_ecdsa_i31_vrfy_asn1) {
@@ -350,6 +350,56 @@ uint32_t generic_irsa(void *fn_pointer, const br_ec_impl *impl,
 	}
 }
 
+uint32_t g_irsa(void *fn_pointer, const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len){
+	if (fn_pointer == &br_rsa_i31_pkcs1_vrfy) {
+		return br_rsa_i31_pkcs1_vrfy(impl, hash, hash_len, pk, sig, sig_len);
+	} else {
+		abort();
+	}
+}
+
+// Separate dn hash from normal generic hash functions
+void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx){
+	if (fn_pointer == &br_sha256_init) {
+		br_sha256_init(ctx);
+	} else {
+		abort();
+	}
+}
+
+void br_hash_dn_update(void *fn_pointer, const br_hash_class *const *ctx, const void *data, size_t len){
+	if (fn_pointer == &br_sha256_update) {
+		br_sha256_update(ctx, data, len);
+	} else {
+		abort();
+	}
+}
+
+void br_hash_dn_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst){
+	if (fn_pointer == &br_sha256_out) {
+		br_sha256_out(ctx, dst);
+	} else {
+		abort();
+	}
+}
+
+void br_hash_dn_state(void *fn_pointer, const br_hash_class *const *ctx, void *out){
+	if (fn_pointer == &br_sha256_state) {
+		br_sha256_state(ctx, out);
+	} else {
+		abort();
+	}
+}
+
+void br_hash_dn_set_state(void *fn_pointer, const br_hash_class *const *ctx, void *stb, uint64_t count){
+	if (fn_pointer == &br_sha256_set_state) {
+		br_sha256_set_state(ctx, stb, count);
+	} else {
+		abort();
+	}
+}
 
 void generic_hs_run(void *fn_pointer, void *cc){
 	if (fn_pointer == &br_ssl_hs_client_run) {

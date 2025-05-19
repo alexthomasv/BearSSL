@@ -157,8 +157,9 @@ br_ccm_aad_inject(br_ccm_context *ctx, const void *data, size_t len)
 		memcpy(ctx->buf + ptr, dbuf, clen);
 		dbuf += clen;
 		len -= clen;
-		(*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
-			ctx->buf, sizeof ctx->buf);
+		g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, ctx->buf, sizeof ctx->buf);
+		// (*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
+		// 	ctx->buf, sizeof ctx->buf);
 	}
 
 	/*
@@ -166,7 +167,8 @@ br_ccm_aad_inject(br_ccm_context *ctx, const void *data, size_t len)
 	 */
 	ptr = len & 15;
 	len -= ptr;
-	(*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac, dbuf, len);
+	g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, dbuf, len);
+	// (*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac, dbuf, len);
 	dbuf += len;
 
 	/*
@@ -188,8 +190,9 @@ br_ccm_flip(br_ccm_context *ctx)
 	ptr = ctx->ptr;
 	if (ptr != 0) {
 		memset(ctx->buf + ptr, 0, (sizeof ctx->buf) - ptr);
-		(*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
-			ctx->buf, sizeof ctx->buf);
+		g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, ctx->buf, sizeof ctx->buf);
+		// (*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
+		// 	ctx->buf, sizeof ctx->buf);
 		ctx->ptr = 0;
 	}
 
@@ -246,8 +249,9 @@ br_ccm_run(br_ccm_context *ctx, int encrypt, void *data, size_t len)
 			ctx->ptr = ptr;
 			return;
 		}
-		(*ctx->bctx)->mac(ctx->bctx,
-			ctx->cbcmac, ctx->buf, sizeof ctx->buf);
+		g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, ctx->buf, sizeof ctx->buf);
+		// (*ctx->bctx)->mac(ctx->bctx,
+		// 	ctx->cbcmac, ctx->buf, sizeof ctx->buf);
 	}
 
 	/*
@@ -284,8 +288,10 @@ br_ccm_run(br_ccm_context *ctx, int encrypt, void *data, size_t len)
 		size_t u;
 
 		memset(ctx->buf, 0, sizeof ctx->buf);
-		(*ctx->bctx)->ctr(ctx->bctx, ctx->ctr,
+		g_br_block_ctr((*ctx->bctx)->ctr, ctx->bctx, ctx->ctr,
 			ctx->buf, sizeof ctx->buf);
+		// (*ctx->bctx)->ctr(ctx->bctx, ctx->ctr,
+		// 	ctx->buf, sizeof ctx->buf);
 		if (encrypt) {
 			for (u = 0; u < ptr; u ++) {
 				unsigned w, x;
@@ -322,8 +328,9 @@ br_ccm_get_tag(br_ccm_context *ctx, void *tag)
 	ptr = ctx->ptr;
 	if (ptr != 0) {
 		memset(ctx->buf + ptr, 0, (sizeof ctx->buf) - ptr);
-		(*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
-			ctx->buf, sizeof ctx->buf);
+		g_br_block_mac((*ctx->bctx)->mac, ctx->bctx, ctx->cbcmac, ctx->buf, sizeof ctx->buf);
+		// (*ctx->bctx)->mac(ctx->bctx, ctx->cbcmac,
+		// 	ctx->buf, sizeof ctx->buf);
 	}
 
 	/*

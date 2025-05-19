@@ -283,13 +283,6 @@
 #define MAX_IN_OVERHEAD    325
 
 
-extern void
-out_ccm_init(br_sslrec_ccm_context *cc,
-	const br_block_ctrcbc_class *bc_impl,
-	const void *key, size_t key_len,
-	const void *iv, size_t tag_len);
-	
-
 /* see inner.h */
 void
 br_ssl_engine_fail(br_ssl_engine_context *rc, int err)

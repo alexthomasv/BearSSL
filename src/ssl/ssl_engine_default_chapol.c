@@ -32,12 +32,12 @@ static unsigned char *
 chapol_decrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static void
+void
 in_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
 	const void *key, const void *iv);
 
-static void
+void
 out_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
 	const void *key, const void *iv);
