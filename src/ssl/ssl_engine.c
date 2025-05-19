@@ -289,42 +289,56 @@ static unsigned char *
 clear_encrypt(br_sslrec_out_clear_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 cbc_encrypt(br_sslrec_out_cbc_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 gcm_encrypt(br_sslrec_gcm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 ccm_encrypt(br_sslrec_ccm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 chapol_encrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 gcm_decrypt(br_sslrec_gcm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 ccm_decrypt(br_sslrec_ccm_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static unsigned char *
+extern unsigned char *
 chapol_decrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len);
 
-static int cbc_check_length(const br_sslrec_in_class **ctx, size_t len);
-static int gcm_check_length(const br_sslrec_in_class **ctx, size_t len);
-static int ccm_check_length(const br_sslrec_in_class **ctx, size_t len);
-static int chapol_check_length(const br_sslrec_in_class **ctx, size_t len);
+extern int cbc_check_length(const br_sslrec_in_class **ctx, size_t len);
+extern int gcm_check_length(const br_sslrec_in_class **ctx, size_t len);
+extern int ccm_check_length(const br_sslrec_in_class **ctx, size_t len);
+extern int chapol_check_length(const br_sslrec_in_class **ctx, size_t len);
+
+void br_poly1305_ctmul_run(const void *key, const void *iv,
+	void *data, size_t len, const void *aad, size_t aad_len,
+	void *tag, br_chacha20_run ichacha, int encrypt);
+
+static uint32_t
+api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+uint32_t
+br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
 void generic_max_plaintext(void *fn_pointer, const br_sslrec_out_class *const *ctx, size_t *start, size_t *end)
 {
@@ -345,6 +359,25 @@ void generic_clear_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
 		assert(0);
 	}
 }
+
+void generic_enc_init(void *fn_pointer, const br_block_cbcenc_class **ctx,
+		const void *key, size_t key_len){
+	if (fn_pointer == &br_aes_ct64_cbcenc_init) {
+		br_aes_ct64_cbcenc_init(ctx, key, key_len);
+	} else{
+		assert(0);
+	}
+}
+
+void generic_enc_run(void *fn_pointer, const br_block_cbcenc_class **ctx,
+		const void *iv, void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_cbcenc_run) {
+		br_aes_ct64_cbcenc_run(ctx, iv, data, len);
+	} else{
+		assert(0);
+	}
+}
+
 
 unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
 		int record_type, unsigned version,
@@ -381,6 +414,77 @@ unsigned char *generic_decrypt(void *fn_pointer, const br_sslrec_in_class **ctx,
 }
 
 
+void generic_ipoly(void *fn_pointer, const void *key, const void *iv,
+	void *data, size_t len, const void *aad, size_t aad_len,
+	void *tag, br_chacha20_run ichacha, int encrypt){
+	if (fn_pointer == &br_poly1305_ctmul_run) {
+		return br_poly1305_ctmul_run(key, iv, data, len, aad, aad_len, tag, ichacha, encrypt);
+	} else {
+		assert(0);
+	}
+}
+
+uint32_t generic_chacha(void *fn_pointer, const void *key,
+	const void *iv, uint32_t cc, void *data, size_t len){
+	if (fn_pointer == &br_chacha20_ct_run) {
+		return br_chacha20_ct_run(key, iv, cc, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void generic_ghash(void *fn_pointer, void *y, const void *h, const void *data, size_t len){
+	if (fn_pointer == &br_ghash_ctmul) {
+		return br_ghash_ctmul64(y, h, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void g_br_block_init(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
+		const void *key, size_t key_len){
+	if (fn_pointer == &br_aes_ct64_ctrcbc_init) {
+		return br_aes_ct64_ctrcbc_init(ctx, key, key_len);
+	} else {
+		assert(0);
+	}
+}
+
+void g_br_block_encrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
+		void *ctr, void *cbcmac, void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_ctrcbc_encrypt) {
+		return br_aes_ct64_ctrcbc_encrypt(ctx, ctr, cbcmac, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void g_br_block_decrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
+		void *ctr, void *cbcmac, void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_ctrcbc_decrypt) {
+		return br_aes_ct64_ctrcbc_decrypt(ctx, ctr, cbcmac, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void g_br_block_ctr(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
+		void *ctr, void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_ctrcbc_ctr) {
+		return br_aes_ct64_ctrcbc_ctr(ctx, ctr, data, len);
+	} else {
+		assert(0);
+	}
+}
+
+void g_br_block_mac(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
+		void *cbcmac, const void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_ctrcbc_mac) {
+		return br_aes_ct64_ctrcbc_mac(ctx, cbcmac, data, len);
+	} else {
+		assert(0);
+	}
+}
 
 /* see inner.h */
 void
@@ -727,17 +831,21 @@ static int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx
 	}
 }
 
-uint32_t generic_mul_add(void *fn_pointer, uint32_t a, uint32_t b, uint32_t c){
-	if (fn_pointer == &api_mulgen) {
-		return api_mulgen(a, b, c);
+uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve){
+	if (fn_pointer == &api_muladd) {
+		return api_muladd(A, B, len, x, xlen, y, ylen, curve);
 	} else {
 		assert(0);
 	}
 }
 
-uint32_t generic_irsa(void *fn_pointer, uint32_t a, uint32_t b, uint32_t c){
-	if (fn_pointer == &irsa) {
-		return irsa(a, b, c);
+uint32_t generic_irsa(void *fn_pointer, const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len){
+	if (fn_pointer == &br_ecdsa_i31_vrfy_asn1) {
+		return br_ecdsa_i31_vrfy_asn1(impl, hash, hash_len, pk, sig, sig_len);
 	} else {
 		assert(0);
 	}
@@ -1662,9 +1770,12 @@ br_ssl_engine_switch_cbc_in(br_ssl_engine_context *cc,
 	if (iv_len == 0) {
 		iv = NULL;
 	}
-	cc->icbc_in->init(&cc->in.cbc.vtable,
+	in_cbc_init(&cc->in.cbc.vtable,
 		bc_impl, cipher_key, cipher_key_len,
 		imh, mac_key, mac_key_len, mac_out_len, iv);
+	// cc->icbc_in->init(&cc->in.cbc.vtable,
+	// 	bc_impl, cipher_key, cipher_key_len,
+	// 	imh, mac_key, mac_key_len, mac_out_len, iv);
 	cc->incrypt = 1;
 }
 
@@ -1705,9 +1816,12 @@ br_ssl_engine_switch_cbc_out(br_ssl_engine_context *cc,
 	if (iv_len == 0) {
 		iv = NULL;
 	}
-	cc->icbc_out->init(&cc->out.cbc.vtable,
+	out_cbc_init(&cc->out.cbc.vtable,
 		bc_impl, cipher_key, cipher_key_len,
 		imh, mac_key, mac_key_len, mac_out_len, iv);
+	// cc->icbc_out->init(&cc->out.cbc.vtable,
+	// 	bc_impl, cipher_key, cipher_key_len,
+	// 	imh, mac_key, mac_key_len, mac_out_len, iv);
 }
 
 /* see inner.h */
@@ -1727,8 +1841,10 @@ br_ssl_engine_switch_gcm_in(br_ssl_engine_context *cc,
 		cipher_key = &kb[0];
 		iv = &kb[cipher_key_len << 1];
 	}
-	cc->igcm_in->init(&cc->in.gcm.vtable.in,
+	in_gcm_init(&cc->in.gcm.vtable.in, 
 		bc_impl, cipher_key, cipher_key_len, cc->ighash, iv);
+	// cc->igcm_in->init(&cc->in.gcm.vtable.in,
+	// 	bc_impl, cipher_key, cipher_key_len, cc->ighash, iv);
 	cc->incrypt = 1;
 }
 
@@ -1749,8 +1865,10 @@ br_ssl_engine_switch_gcm_out(br_ssl_engine_context *cc,
 		cipher_key = &kb[cipher_key_len];
 		iv = &kb[(cipher_key_len << 1) + 4];
 	}
-	cc->igcm_out->init(&cc->out.gcm.vtable.out,
+	out_gcm_init(&cc->out.gcm.vtable.out,
 		bc_impl, cipher_key, cipher_key_len, cc->ighash, iv);
+	// cc->igcm_out->init(&cc->out.gcm.vtable.out,
+	// 	bc_impl, cipher_key, cipher_key_len, cc->ighash, iv);
 }
 
 /* see inner.h */
@@ -1769,8 +1887,10 @@ br_ssl_engine_switch_chapol_in(br_ssl_engine_context *cc,
 		cipher_key = &kb[0];
 		iv = &kb[64];
 	}
-	cc->ichapol_in->init(&cc->in.chapol.vtable.in,
+	in_chapol_init(&cc->in.chapol.vtable.in,
 		cc->ichacha, cc->ipoly, cipher_key, iv);
+	// cc->ichapol_in->init(&cc->in.chapol.vtable.in,
+	// 	cc->ichacha, cc->ipoly, cipher_key, iv);
 	cc->incrypt = 1;
 }
 
@@ -1790,8 +1910,10 @@ br_ssl_engine_switch_chapol_out(br_ssl_engine_context *cc,
 		cipher_key = &kb[32];
 		iv = &kb[76];
 	}
-	cc->ichapol_out->init(&cc->out.chapol.vtable.out,
+	out_chapol_init(&cc->out.chapol.vtable.out,
 		cc->ichacha, cc->ipoly, cipher_key, iv);
+	// cc->ichapol_out->init(&cc->out.chapol.vtable.out,
+	// 	cc->ichacha, cc->ipoly, cipher_key, iv);
 }
 
 /* see inner.h */
@@ -1812,8 +1934,9 @@ br_ssl_engine_switch_ccm_in(br_ssl_engine_context *cc,
 		cipher_key = &kb[0];
 		iv = &kb[cipher_key_len << 1];
 	}
-	cc->iccm_in->init(&cc->in.ccm.vtable.in,
-		bc_impl, cipher_key, cipher_key_len, iv, tag_len);
+	in_ccm_init(&cc->in.ccm.vtable.in, bc_impl, cipher_key, cipher_key_len, iv, tag_len);
+	// cc->iccm_in->init(&cc->in.ccm.vtable.in,
+	// 	bc_impl, cipher_key, cipher_key_len, iv, tag_len);
 	cc->incrypt = 1;
 }
 
@@ -1835,6 +1958,8 @@ br_ssl_engine_switch_ccm_out(br_ssl_engine_context *cc,
 		cipher_key = &kb[cipher_key_len];
 		iv = &kb[(cipher_key_len << 1) + 4];
 	}
-	cc->iccm_out->init(&cc->out.ccm.vtable.out,
+	out_ccm_init(&cc->out.ccm.vtable.out,
 		bc_impl, cipher_key, cipher_key_len, iv, tag_len);
+	// cc->iccm_out->init(&cc->out.ccm.vtable.out,
+	// 	bc_impl, cipher_key, cipher_key_len, iv, tag_len);
 }

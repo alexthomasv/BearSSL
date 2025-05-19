@@ -56,8 +56,10 @@ gen_chapol_process(br_sslrec_chapol_context *cc,
 		nonce[11 - u] ^= (unsigned char)seq;
 		seq >>= 8;
 	}
-	cc->ipoly(cc->key, nonce, data, len, header, sizeof header,
-		tag, cc->ichacha, encrypt);
+	generic_ipoly(cc->ipoly, cc->key, nonce, data, len, header, sizeof header,
+		cc->ichacha, encrypt);
+	// cc->ipoly(cc->key, nonce, data, len, header, sizeof header,
+		// tag, cc->ichacha, encrypt);
 }
 
 static void

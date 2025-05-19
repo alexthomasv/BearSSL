@@ -91,7 +91,8 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	/*
 	 * Get current input length and compute total bit length.
 	 */
-	count = dig->state(&hc.vtable, tmp1);
+	// count = dig->state(&hc.vtable, tmp1);
+	generic_hash_state(dig->state, &hc.vtable, tmp1);
 	bit_len = (count + (uint64_t)len) << 3;
 
 	/*
@@ -104,7 +105,8 @@ br_hmac_outCT(const br_hmac_context *ctx,
 		size_t zlen;
 
 		zlen = (size_t)(ncount - count);
-		dig->update(&hc.vtable, data, zlen);
+		// dig->update(&hc.vtable, data, zlen);
+		generic_hash_update(dig->update, &hc.vtable, data, zlen);
 		data = (const unsigned char *)data + zlen;
 		len -= zlen;
 		max_len -= zlen;
@@ -174,9 +176,11 @@ br_hmac_outCT(const br_hmac_context *ctx,
 		x0 = MUX(EQ(u, (uint32_t)len), 0x80, d);
 		x1 = MUX(LT(u, kl), 0x00, e);
 		x[0] = MUX(LE(u, (uint32_t)len), x0, x1);
-		dig->update(&hc.vtable, x, 1);
+		// dig->update(&hc.vtable, x, 1);
+		generic_hash_update(dig->update, &hc.vtable, x, 1);
 		if (v == (bs - 1)) {
-			dig->state(&hc.vtable, tmp1);
+			generic_hash_state(dig->state, &hc.vtable, tmp1);
+			// dig->state(&hc.vtable, tmp1);
 			CCOPY(EQ(u, kz), tmp2, tmp1, hlen);
 		}
 	}
@@ -184,10 +188,15 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	/*
 	 * Inner hash output is in tmp2[]; we finish processing.
 	 */
-	dig->init(&hc.vtable);
-	dig->set_state(&hc.vtable, ctx->kso, (uint64_t)bs);
-	dig->update(&hc.vtable, tmp2, hlen);
-	dig->out(&hc.vtable, tmp2);
+	generic_hash_init(dig->init, &hc.vtable, ctx->kso, (uint64_t)bs);
+	generic_hash_set_state(dig->set_state, &hc.vtable, ctx->kso, (uint64_t)bs);
+	generic_hash_update(dig->update, &hc.vtable, tmp2, hlen);
+	generic_hash_out(dig->out, &hc.vtable, tmp2);
+	
+	// dig->init(&hc.vtable);
+	// dig->set_state(&hc.vtable, ctx->kso, (uint64_t)bs);
+	// dig->update(&hc.vtable, tmp2, hlen);
+	// dig->out(&hc.vtable, tmp2);
 	memcpy(out, tmp2, ctx->out_len);
 	return ctx->out_len;
 }

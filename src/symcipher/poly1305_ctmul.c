@@ -159,14 +159,15 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	 * pkey[].
 	 */
 	memset(pkey, 0, sizeof pkey);
-	ichacha(key, iv, 0, pkey, sizeof pkey);
-
+	// ichacha(key, iv, 0, pkey, sizeof pkey);
+	generic_chacha(ichacha, key, iv, 0, pkey, sizeof pkey);
 	/*
 	 * If encrypting, ChaCha20 must run first, followed by Poly1305.
 	 * When decrypting, the operations are reversed.
 	 */
 	if (encrypt) {
-		ichacha(key, iv, 1, data, len);
+		// ichacha(key, iv, 1, data, len);
+		generic_chacha(ichacha, key, iv, 1, data, len);
 	}
 
 	/*
@@ -255,6 +256,7 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	 * If decrypting, then ChaCha20 runs _after_ Poly1305.
 	 */
 	if (!encrypt) {
-		ichacha(key, iv, 1, data, len);
+		// ichacha(key, iv, 1, data, len);
+		generic_chacha(ichacha, key, iv, 1, data, len);
 	}
 }

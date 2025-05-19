@@ -39,12 +39,14 @@ gen_gcm_init(br_sslrec_gcm_context *cc,
 	unsigned char tmp[12];
 
 	cc->seq = 0;
-	bc_impl->init(&cc->bc.vtable, key, key_len);
+	generic_enc_init(bc_impl->init, &cc->bc.vtable, key, key_len);
+	// bc_impl->init(&cc->bc.vtable, key, key_len);
 	cc->gh = gh_impl;
 	memcpy(cc->iv, iv, sizeof cc->iv);
 	memset(cc->h, 0, sizeof cc->h);
 	memset(tmp, 0, sizeof tmp);
-	bc_impl->run(&cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
+	// bc_impl->run(&cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
+	generic_enc_run(bc_impl->run, &cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
 }
 
 static void
@@ -97,9 +99,12 @@ do_tag(br_sslrec_gcm_context *cc,
 	br_enc64be(footer, (uint64_t)(sizeof header) << 3);
 	br_enc64be(footer + 8, (uint64_t)len << 3);
 	memset(tag, 0, 16);
-	cc->gh(tag, cc->h, header, sizeof header);
-	cc->gh(tag, cc->h, data, len);
-	cc->gh(tag, cc->h, footer, sizeof footer);
+	generic_ghash(cc->gh, tag, cc->h, header, sizeof header);
+	generic_ghash(cc->gh, tag, cc->h, data, len);
+	generic_ghash(cc->gh, tag, cc->h, footer, sizeof footer);
+	// cc->gh(tag, cc->h, header, sizeof header);
+	// cc->gh(tag, cc->h, data, len);
+	// cc->gh(tag, cc->h, footer, sizeof footer);
 }
 
 /*
@@ -115,8 +120,10 @@ do_ctr(br_sslrec_gcm_context *cc, const void *nonce, void *data, size_t len,
 
 	memcpy(iv, cc->iv, 4);
 	memcpy(iv + 4, nonce, 8);
-	cc->bc.vtable->run(&cc->bc.vtable, iv, 2, data, len);
-	cc->bc.vtable->run(&cc->bc.vtable, iv, 1, xortag, 16);
+	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 2, data, len);
+	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 1, xortag, 16);
+	// cc->bc.vtable->run(&cc->bc.vtable, iv, 2, data, len);
+	// cc->bc.vtable->run(&cc->bc.vtable, iv, 1, xortag, 16);
 }
 
 static unsigned char *

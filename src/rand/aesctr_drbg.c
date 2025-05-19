@@ -77,8 +77,10 @@ br_aesctr_drbg_generate(br_aesctr_drbg_context *ctx, void *out, size_t len)
 		 * Run CTR.
 		 */
 		memset(buf, 0, clen);
-		ctx->cc = ctx->sk.vtable->run(&ctx->sk.vtable,
+		ctx->cc = generic_enc_run(ctx->sk.vtable->run, &ctx->sk.vtable,
 			iv, ctx->cc, buf, clen);
+		// ctx->cc = ctx->sk.vtable->run(&ctx->sk.vtable,
+		// 	iv, ctx->cc, buf, clen);
 		buf += clen;
 		len -= clen;
 
@@ -133,7 +135,9 @@ br_aesctr_drbg_update(br_aesctr_drbg_context *ctx, const void *seed, size_t len)
 	 */
 	memset(iv, 0xFF, sizeof iv);
 	memset(s, 0, 16);
-	ctx->sk.vtable->run(&ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
+
+	generic_enc_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
+	// ctx->sk.vtable->run(&ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
 
 	/*
 	 * Set G[] and H[] to conventional start values.
@@ -169,20 +173,25 @@ br_aesctr_drbg_update(br_aesctr_drbg_context *ctx, const void *seed, size_t len)
 			seed = (const unsigned char *)seed + clen;
 			len -= clen;
 		}
-		ctx->sk.vtable->init(&ctx->sk.vtable, tmp, 32);
-
+		// ctx->sk.vtable->init(&ctx->sk.vtable, tmp, 32);
+		generic_enc_init(ctx->sk.vtable->init, &ctx->sk.vtable, tmp, 32);
 		/*
 		 * Compute new G and H values.
 		 */
 		memcpy(iv, G, 12);
 		memcpy(newG, G, 16);
-		ctx->sk.vtable->run(&ctx->sk.vtable, iv,
+
+		generic_enc_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
 			br_dec32be(G + 12), newG, 16);
+		// ctx->sk.vtable->run(&ctx->sk.vtable, iv,
+		// 	br_dec32be(G + 12), newG, 16);
 		iv[0] ^= 0x01;
 		memcpy(H, G, 16);
 		H[0] ^= 0x01;
-		ctx->sk.vtable->run(&ctx->sk.vtable, iv,
+		generic_enc_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
 			br_dec32be(G + 12), H, 16);
+		// ctx->sk.vtable->run(&ctx->sk.vtable, iv,
+		// 	br_dec32be(G + 12), H, 16);
 		memcpy(G, newG, 16);
 	}
 
@@ -190,7 +199,8 @@ br_aesctr_drbg_update(br_aesctr_drbg_context *ctx, const void *seed, size_t len)
 	 * Output hash value is H||G. We truncate it to its first 128 bits,
 	 * i.e. H; that's our new AES key.
 	 */
-	ctx->sk.vtable->init(&ctx->sk.vtable, H, 16);
+	// ctx->sk.vtable->init(&ctx->sk.vtable, H, 16);
+	generic_enc_init(ctx->sk.vtable->init, &ctx->sk.vtable, H, 16);
 	ctx->cc = 0;
 }
 

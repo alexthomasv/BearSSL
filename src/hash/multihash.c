@@ -138,10 +138,14 @@ br_multihash_update(br_multihash_context *ctx, const void *data, size_t len)
 
 					state = (unsigned char *)ctx
 						+ get_state_offset(i);
-					hc->set_state(&g.vtable,
-						state, ctx->count - 128);
-					hc->update(&g.vtable, ctx->buf, 128);
-					hc->state(&g.vtable, state);
+					generic_hash_set_state(hc->set_state, &g.vtable, state, ctx->count - 128);
+					generic_hash_update(hc->update, &g.vtable, ctx->buf, 128);
+					generic_hash_state(hc->state, &g.vtable, state);
+					
+					// hc->set_state(&g.vtable,
+					// 	state, ctx->count - 128);
+					// hc->update(&g.vtable, ctx->buf, 128);
+					// hc->state(&g.vtable, state);
 				}
 			}
 			ptr = 0;
@@ -162,8 +166,12 @@ br_multihash_out(const br_multihash_context *ctx, int id, void *dst)
 		return 0;
 	}
 	state = (const unsigned char *)ctx + get_state_offset(id);
-	hc->set_state(&g.vtable, state, ctx->count & ~(uint64_t)127);
-	hc->update(&g.vtable, ctx->buf, ctx->count & (uint64_t)127);
-	hc->out(&g.vtable, dst);
+	generic_hash_set_state(hc->set_state, &g.vtable, state, ctx->count & ~(uint64_t)127);
+	generic_hash_update(hc->update, &g.vtable, ctx->buf, ctx->count & (uint64_t)127);
+	generic_hash_out(hc->out, &g.vtable, dst);
+	
+	// hc->set_state(&g.vtable, state, ctx->count & ~(uint64_t)127);
+	// hc->update(&g.vtable, ctx->buf, ctx->count & (uint64_t)127);
+	// hc->out(&g.vtable, dst);
 	return (hc->desc >> BR_HASHDESC_OUT_OFF) & BR_HASHDESC_OUT_MASK;
 }

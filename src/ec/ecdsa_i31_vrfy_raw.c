@@ -144,7 +144,7 @@ br_ecdsa_i31_vrfy_raw(const br_ec_impl *impl,
 	 */
 	ulen = cd->generator_len;
 	memcpy(eU, pk->q, ulen);
-	res = generic_mul_add(impl->muladd, eU, NULL, ulen,
+	res = generic_muladd(impl->muladd, eU, NULL, ulen,
 		tx, nlen, ty, nlen, cd->curve);
 	// res = impl->muladd(eU, NULL, ulen,
 	// 	tx, nlen, ty, nlen, cd->curve);

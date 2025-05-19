@@ -36,7 +36,8 @@ gen_ccm_init(br_sslrec_ccm_context *cc,
 	const void *iv, size_t tag_len)
 {
 	cc->seq = 0;
-	bc_impl->init(&cc->bc.vtable, key, key_len);
+	// bc_impl->init(&cc->bc.vtable, key, key_len);
+	generic_enc_init(bc_impl->init, &cc->bc.vtable, key, key_len);
 	memcpy(cc->iv, iv, sizeof cc->iv);
 	cc->tag_len = tag_len;
 }

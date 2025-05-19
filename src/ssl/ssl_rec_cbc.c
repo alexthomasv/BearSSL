@@ -45,7 +45,8 @@ in_cbc_init(br_sslrec_in_cbc_context *cc,
 	cbc->check_length = cbc_check_length;
 	cbc->decrypt = cbc_decrypt;
 	cc->seq = 0;
-	bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
+	// bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
+	generic_enc_init(bc_impl->init, &cc->bc.vtable, bc_key, bc_key_len);
 	br_hmac_key_init(&cc->mac, dig_impl, mac_key, mac_key_len);
 	cc->mac_len = mac_out_len;
 	if (iv == NULL) {
@@ -132,7 +133,8 @@ cbc_decrypt(br_sslrec_in_cbc_context *cc,
 	 * "decrypt" it using the implicit IV (from previous record),
 	 * which is useless but harmless.
 	 */
-	cc->bc.vtable->run(&cc->bc.vtable, cc->iv, data, len);
+	// cc->bc.vtable->run(&cc->bc.vtable, cc->iv, data, len);
+	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, data, len);
 	if (cc->explicit_IV) {
 		buf += blen;
 		len -= blen;
@@ -285,7 +287,8 @@ out_cbc_init(br_sslrec_out_cbc_context *cc,
 {
 	cc->vtable = &br_sslrec_out_cbc_vtable;
 	cc->seq = 0;
-	bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
+	// bc_impl->init(&cc->bc.vtable, bc_key, bc_key_len);
+	generic_enc_init(bc_impl->init, &cc->bc.vtable, bc_key, bc_key_len);
 	br_hmac_key_init(&cc->mac, dig_impl, mac_key, mac_key_len);
 	cc->mac_len = mac_out_len;
 	if (iv == NULL) {
@@ -420,8 +423,8 @@ cbc_encrypt(br_sslrec_out_cbc_context *cc,
 	 * encrypt it, which is fine (encryption of a uniformly random
 	 * block is still a uniformly random block).
 	 */
-	cc->bc.vtable->run(&cc->bc.vtable, cc->iv, buf, len);
-
+	// cc->bc.vtable->run(&cc->bc.vtable, cc->iv, buf, len);
+	generic_enc_run(cc->bc.vtable->run, &cc->bc.vtable, cc->iv, buf, len);
 	/*
 	 * Add the header and return.
 	 */
