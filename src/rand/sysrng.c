@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#define BR_ENABLE_INTRINSICS   1
+#define BR_ENABLE_INTRINSICS   0
 #include "inner.h"
 
 #if BR_USE_GETENTROPY

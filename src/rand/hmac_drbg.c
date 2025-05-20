@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include <stdio.h>
 
 /* see bearssl.h */
 void
@@ -31,10 +32,6 @@ br_hmac_drbg_init(br_hmac_drbg_context *ctx,
 {
 	size_t hlen;
 	ctx->vtable = &br_hmac_drbg_vtable;
-	// Signal to boogie that we are using these functions
-	((br_prng_class *)ctx->vtable)->init = br_hmac_drbg_init;
-	((br_prng_class *)ctx->vtable)->generate = br_hmac_drbg_generate;
-	((br_prng_class *)ctx->vtable)->update = br_hmac_drbg_update;
 	hlen = br_digest_size(digest_class);
 	memset(ctx->K, 0x00, hlen);
 	memset(ctx->V, 0x01, hlen);
@@ -46,6 +43,7 @@ br_hmac_drbg_init(br_hmac_drbg_context *ctx,
 void
 br_hmac_drbg_generate(br_hmac_drbg_context *ctx, void *out, size_t len)
 {
+	printf("in br_hmac_drbg_generate\n");
 	const br_hash_class *dig;
 	br_hmac_key_context kc;
 	br_hmac_context hc;
@@ -71,7 +69,7 @@ br_hmac_drbg_generate(br_hmac_drbg_context *ctx, void *out, size_t len)
 		buf += clen;
 		len -= clen;
 	}
-
+	printf("after while loop\n");
 	/*
 	 * To prepare the state for the next request, we should call
 	 * br_hmac_drbg_update() with an empty additional seed. However,

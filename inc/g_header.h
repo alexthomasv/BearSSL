@@ -12,6 +12,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "inner.h"   /* BearSSL internal structs (br_sslrec_*, br_hash_*, …) */
 
 /*--------------------------------------------------------------------
@@ -44,6 +46,8 @@ unsigned char *generic_decrypt(void *fn_ptr,
         int record_type, unsigned version,
         void *ciphertext, size_t *len);
 
+int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_t len);
+
 /*--------------------------------------------------------------------
  *  AEAD / Poly1305 / ChaCha helpers
  *------------------------------------------------------------------*/
@@ -62,6 +66,22 @@ void generic_ghash(void *fn_ptr,
         void *y, const void *h,
         const void *data, size_t len);
 
+void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx);
+
+void br_hash_dn_update(void *fn_pointer, const br_hash_class *const *ctx,
+        const void *data, size_t len);
+
+void br_hash_dn_out(void *fn_pointer, const br_hash_class *const *ctx,
+        void *dst);
+
+uint32_t g_iecdsa(void *fn_pointer, const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len);
+
+uint32_t g_irsa(void *fn_pointer, const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len);
+
 /*--------------------------------------------------------------------
  *  CTR-CBC helpers
  *------------------------------------------------------------------*/
@@ -77,6 +97,11 @@ void g_br_block_encrypt(void *fn_ptr,
 void g_br_block_decrypt(void *fn_ptr,
         const br_block_ctrcbc_class * const *ctx,
         void *ctr, void *cbcmac,
+        void *data, size_t len);
+
+uint32_t g_br_block_ctr_run(void *fn_pointer,
+        const br_block_ctr_class *const *ctx,
+        const void *iv, uint32_t cc,
         void *data, size_t len);
 
 void g_br_block_ctr(void *fn_ptr,
@@ -124,6 +149,8 @@ uint32_t generic_irsa(void *fn_ptr,
         const br_ec_public_key *pk,
         const void *sig, size_t sig_len);
 
+void generic_hs_run(void *fn_pointer, void *cc);
+
 
 // Needed for ssl_engine.c
 extern void in_ccm_init(br_sslrec_ccm_context *cc,
@@ -136,15 +163,19 @@ extern void out_ccm_init(br_sslrec_ccm_context *cc,
 	const void *key, size_t key_len,
 	const void *iv, size_t tag_len);
 
-extern void in_gcm_init(br_sslrec_gcm_context *cc,
+extern void
+in_gcm_init(br_sslrec_gcm_context *cc,
 	const br_block_ctr_class *bc_impl,
 	const void *key, size_t key_len,
-	const void *iv, size_t tag_len);
+	br_ghash gh_impl,
+	const void *iv);
 
-extern void out_gcm_init(br_sslrec_gcm_context *cc,
+extern void
+out_gcm_init(br_sslrec_gcm_context *cc,
 	const br_block_ctr_class *bc_impl,
 	const void *key, size_t key_len,
-	const void *iv, size_t tag_len);
+	br_ghash gh_impl,
+	const void *iv);
 
 extern void in_cbc_init(br_sslrec_in_cbc_context *cc,
 	const br_block_cbcdec_class *bc_impl,
@@ -169,5 +200,81 @@ extern void
 out_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
 	const void *key, const void *iv);
+
+
+
+// Needed for ec_all_m31.c
+extern const unsigned char *
+ec_c_25519_m31_api_generator(int curve, size_t *len);
+
+extern const unsigned char *
+ec_c_25519_m31_api_order(int curve, size_t *len);
+
+extern size_t
+ec_c_25519_m31_api_xoff(int curve, size_t *len);
+
+extern uint32_t
+ec_c_25519_m31_api_mul(unsigned char *G, size_t Glen,
+	const unsigned char *kb, size_t kblen, int curve);
+
+extern size_t
+ec_c_25519_m31_api_mulgen(unsigned char *R,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern uint32_t
+ec_c_25519_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern size_t
+ec_p_256_m31_api_mulgen(unsigned char *R,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern const unsigned char *
+ec_p_256_m31_api_generator(int curve, size_t *len);
+
+extern uint32_t
+ec_p_256_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern uint32_t
+ec_p_256_m31_api_mul(unsigned char *G, size_t Glen,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern uint32_t
+ec_prime_i31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern const unsigned char *
+ec_p_256_m31_api_order(int curve, size_t *len);
+
+extern size_t
+ec_p_256_m31_api_xoff(int curve, size_t *len);
+
+
+extern const unsigned char *
+ec_prime_i31_api_generator(int curve, size_t *len);
+
+extern uint32_t
+ec_prime_i31_api_mul(unsigned char *G, size_t Glen,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern size_t
+ec_prime_i31_api_mulgen(unsigned char *R,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern const unsigned char *
+ec_prime_i31_api_generator(int curve, size_t *len);
+
+extern const unsigned char *
+ec_prime_i31_api_order(int curve, size_t *len);
+
+extern size_t
+ec_prime_i31_api_xoff(int curve, size_t *len);
+
+
+
 
 #endif /* GENERIC_WRAPPERS_H */

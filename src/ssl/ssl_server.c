@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /* see bearssl_ssl.h */
 void
@@ -48,5 +49,6 @@ br_ssl_server_reset(br_ssl_server_context *cc)
 	cc->eng.reneg = 0;
 	br_ssl_engine_hs_reset(&cc->eng,
 		br_ssl_hs_server_init_main, br_ssl_hs_server_run);
+	printf("after br_ssl_hs_server_init_main, br_ssl_hs_server_run: %d\n", br_ssl_engine_last_error(&cc->eng));
 	return br_ssl_engine_last_error(&cc->eng) == BR_ERR_OK;
 }

@@ -22,7 +22,9 @@
  * SOFTWARE.
  */
 
+
 #include "inner.h"
+#include "g_header.h"
 
 /* see bearssl_ssl.h */
 void
@@ -30,6 +32,7 @@ br_ssl_server_init_full_rsa(br_ssl_server_context *cc,
 	const br_x509_certificate *chain, size_t chain_len,
 	const br_rsa_private_key *sk)
 {
+	printf("in br_ssl_server_init_full_rsa\n");
 	/*
 	 * The "full" profile supports all implemented cipher suites.
 	 *

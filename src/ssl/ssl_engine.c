@@ -281,6 +281,7 @@
 
 #define MAX_OUT_OVERHEAD    85
 #define MAX_IN_OVERHEAD    325
+#include "g_header.h"
 
 
 /* see inner.h */
@@ -490,6 +491,7 @@ rng_init(br_ssl_engine_context *cc)
 	 * irrelevant here, but they still make people nervous).
 	 */
 	h = br_multihash_getimpl(&cc->mhash, br_sha256_ID);
+	printf("after br_multihash_getimpl: %p\n", h);
 	if (!h) {
 		h = br_multihash_getimpl(&cc->mhash, br_sha384_ID);
 		if (!h) {
@@ -510,9 +512,11 @@ rng_init(br_ssl_engine_context *cc)
 int
 br_ssl_engine_init_rand(br_ssl_engine_context *cc)
 {
+	printf("in init rand\n");
 	if (!rng_init(cc)) {
 		return 0;
 	}
+	printf("after rng init\n");
 
 	/*
 	 * We always try OS/hardware seeding once. If it works, then
@@ -528,10 +532,12 @@ br_ssl_engine_init_rand(br_ssl_engine_context *cc)
 		}
 		cc->rng_os_rand_done = 1;
 	}
+	printf("after rng os rand done\n");
 	if (cc->rng_init_done < 2) {
 		br_ssl_engine_fail(cc, BR_ERR_NO_RANDOM);
 		return 0;
 	}
+	printf("after rng init done\n");
 	return 1;
 }
 
@@ -586,7 +592,9 @@ recvrec_buf(const br_ssl_engine_context *rc, size_t *len)
 	switch (rc->iomode) {
 	case BR_IO_IN:
 	case BR_IO_INOUT:
+		printf("in recvrec_buf: %d\n", rc->iomode);
 		if (rc->ixa == rc->ixb) {
+			printf("before z\n");
 			size_t z;
 
 			z = rc->ixc;
@@ -594,6 +602,7 @@ recvrec_buf(const br_ssl_engine_context *rc, size_t *len)
 				z = rc->ibuf_len - rc->ixa;
 			}
 			*len = z;
+			printf("after z: %d\n", z);
 			return rc->ibuf + rc->ixa;
 		}
 		break;
@@ -1086,8 +1095,10 @@ jump_handshake(br_ssl_engine_context *cc, int action)
 		cc->hlen_in = hlen_in;
 		cc->hlen_out = hlen_out;
 		cc->action = action;
-		generic_hs_run(&cc->hsrun, &cc->cpu);
+		printf("before generic hs run %p, %p\n", cc->hsrun, &cc->cpu);
+		generic_hs_run(cc->hsrun, &cc->cpu);
 		// cc->hsrun(&cc->cpu);
+		printf("after generic hs run\n");
 		if (br_ssl_engine_closed(cc)) {
 			return;
 		}
@@ -1326,7 +1337,9 @@ br_ssl_engine_hs_reset(br_ssl_engine_context *cc,
 	cc->shutdown_recv = 0;
 	cc->application_data = 0;
 	cc->alert = 0;
+	printf("before jump handshake: %p, %p\n", hsrun, hsinit);
 	jump_handshake(cc, 0);
+	printf("after jump handshake\n");
 }
 
 /* see inner.h */

@@ -1,4 +1,5 @@
 #include "inner.h"
+#include "g_header.h"
 
 extern void
 clear_max_plaintext(const br_sslrec_out_clear_context *cc,
@@ -114,9 +115,19 @@ void g_br_block_run(void *fn_pointer, const br_block_cbcenc_class **ctx,
 	}
 }
 
+uint32_t g_br_block_ctr_run(void *fn_pointer, const br_block_ctr_class *const *ctx,
+		const void *iv, uint32_t cc, void *data, size_t len){
+	if (fn_pointer == &br_aes_ct64_ctr_run) {
+		return br_aes_ct64_ctr_run(ctx, iv, cc, data, len);
+	} else{
+		abort();
+	}
+}
+
 unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
 		int record_type, unsigned version,
 		void *plaintext, size_t *len){
+	printf("generic_encrypt: %p\n", fn_pointer);
 	if (fn_pointer == &clear_encrypt) {
 		return clear_encrypt(ctx, record_type, version, plaintext, len);
 	} else if (fn_pointer == &cbc_encrypt) {
@@ -128,6 +139,7 @@ unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx
 	} else if (fn_pointer == &chapol_encrypt) {
 		return chapol_encrypt(ctx, record_type, version, plaintext, len);
 	} else {
+		printf("generic_encrypt: %p, %p, %p\n", fn_pointer, clear_encrypt, &clear_encrypt);
 		abort();
 	}
 }
@@ -152,7 +164,7 @@ void generic_ipoly(void *fn_pointer, const void *key, const void *iv,
 	void *data, size_t len, const void *aad, size_t aad_len,
 	void *tag, br_chacha20_run ichacha, int encrypt){
 	if (fn_pointer == &br_poly1305_ctmul_run) {
-		return br_poly1305_ctmul_run(key, iv, data, len, aad, aad_len, tag, ichacha, encrypt);
+		br_poly1305_ctmul_run(key, iv, data, len, aad, aad_len, tag, ichacha, encrypt);
 	} else {
 		abort();
 	}
@@ -169,7 +181,7 @@ uint32_t generic_chacha(void *fn_pointer, const void *key,
 
 void generic_ghash(void *fn_pointer, void *y, const void *h, const void *data, size_t len){
 	if (fn_pointer == &br_ghash_ctmul) {
-		return br_ghash_ctmul64(y, h, data, len);
+		br_ghash_ctmul64(y, h, data, len);
 	} else {
 		abort();
 	}
@@ -178,7 +190,7 @@ void generic_ghash(void *fn_pointer, void *y, const void *h, const void *data, s
 void g_br_block_init(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 		const void *key, size_t key_len){
 	if (fn_pointer == &br_aes_ct64_ctrcbc_init) {
-		return br_aes_ct64_ctrcbc_init(ctx, key, key_len);
+		br_aes_ct64_ctrcbc_init(ctx, key, key_len);
 	} else {
 		abort();
 	}
@@ -187,7 +199,7 @@ void g_br_block_init(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 void g_br_block_encrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 		void *ctr, void *cbcmac, void *data, size_t len){
 	if (fn_pointer == &br_aes_ct64_ctrcbc_encrypt) {
-		return br_aes_ct64_ctrcbc_encrypt(ctx, ctr, cbcmac, data, len);
+		br_aes_ct64_ctrcbc_encrypt(ctx, ctr, cbcmac, data, len);
 	} else {
 		abort();
 	}
@@ -196,7 +208,7 @@ void g_br_block_encrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 void g_br_block_decrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 		void *ctr, void *cbcmac, void *data, size_t len){
 	if (fn_pointer == &br_aes_ct64_ctrcbc_decrypt) {
-		return br_aes_ct64_ctrcbc_decrypt(ctx, ctr, cbcmac, data, len);
+		br_aes_ct64_ctrcbc_decrypt(ctx, ctr, cbcmac, data, len);
 	} else {
 		abort();
 	}
@@ -205,7 +217,7 @@ void g_br_block_decrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 void g_br_block_ctr(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 		void *ctr, void *data, size_t len){
 	if (fn_pointer == &br_aes_ct64_ctrcbc_ctr) {
-		return br_aes_ct64_ctrcbc_ctr(ctx, ctr, data, len);
+		br_aes_ct64_ctrcbc_ctr(ctx, ctr, data, len);
 	} else {
 		abort();
 	}
@@ -214,7 +226,7 @@ void g_br_block_ctr(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 void g_br_block_mac(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 		void *cbcmac, const void *data, size_t len){
 	if (fn_pointer == &br_aes_ct64_ctrcbc_mac) {
-		return br_aes_ct64_ctrcbc_mac(ctx, cbcmac, data, len);
+		br_aes_ct64_ctrcbc_mac(ctx, cbcmac, data, len);
 	} else {
 		abort();
 	}
@@ -404,7 +416,10 @@ void br_hash_dn_set_state(void *fn_pointer, const br_hash_class *const *ctx, voi
 void generic_hs_run(void *fn_pointer, void *cc){
 	if (fn_pointer == &br_ssl_hs_client_run) {
 		br_ssl_hs_client_run(cc);
+	} else if (fn_pointer == &br_ssl_hs_server_run) {
+		br_ssl_hs_server_run(cc);
 	} else {
+		printf("generic_hs_run: %p, %p, %p\n", fn_pointer, br_ssl_hs_server_run, &br_ssl_hs_server_run);
 		abort();
 	}
 }

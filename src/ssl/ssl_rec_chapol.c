@@ -23,7 +23,7 @@
  */
 
 #include "inner.h"
-
+#include "g_header.h"
 static void
 gen_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
@@ -57,7 +57,7 @@ gen_chapol_process(br_sslrec_chapol_context *cc,
 		seq >>= 8;
 	}
 	generic_ipoly(cc->ipoly, cc->key, nonce, data, len, header, sizeof header,
-		cc->ichacha, encrypt);
+		tag, cc->ichacha, encrypt);
 	// cc->ipoly(cc->key, nonce, data, len, header, sizeof header,
 		// tag, cc->ichacha, encrypt);
 }

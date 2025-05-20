@@ -23,12 +23,7 @@
  */
 
 #include "inner.h"
-
-extern void generic_hash_init(void *fn_pointer, const br_hash_class **ctx);
-extern void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, const void *data, size_t len);
-extern void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst);
-extern void generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, void *out);
-extern void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, void *stb, uint64_t count);
+#include "g_header.h"
 
 static inline size_t
 block_size(const br_hash_class *dig)

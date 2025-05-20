@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 #define I31_LEN     ((BR_MAX_EC_SIZE + 61) / 31)
 #define POINT_LEN   (1 + (((BR_MAX_EC_SIZE + 7) >> 3) << 1))

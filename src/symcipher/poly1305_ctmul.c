@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * Perform the inner processing of blocks for Poly1305. The accumulator

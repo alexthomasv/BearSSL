@@ -53,3 +53,15 @@ target_compile_definitions(bearssl_test_native
     TEST             # expands to ‘-DTEST’
     COMPILE
 )
+
+add_executable(bearssl_server_native ${CMAKE_CURRENT_SOURCE_DIR}/samples/server_basic.c ${ALL_C_SOURCES})
+target_include_directories(bearssl_server_native
+    PRIVATE                   # visible only while building this target
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc      # your own headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/
+)
+target_compile_options(bearssl_server_native PRIVATE
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU,Clang>>:
+        -Werror=implicit-function-declaration
+    >
+)

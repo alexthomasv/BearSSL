@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /* see bearssl_ssl.h */
 void
@@ -51,6 +52,7 @@ br_sslio_init(br_sslio_context *ctx,
 static int
 run_until(br_sslio_context *ctx, unsigned target)
 {
+	printf("in run_until: %d\n", target);
 	for (;;) {
 		unsigned state;
 
@@ -58,7 +60,7 @@ run_until(br_sslio_context *ctx, unsigned target)
 		if (state & BR_SSL_CLOSED) {
 			return -1;
 		}
-
+		printf("after state\n");
 		/*
 		 * If there is some record data to send, do it. This takes
 		 * precedence over everything else.
@@ -68,7 +70,9 @@ run_until(br_sslio_context *ctx, unsigned target)
 			size_t len;
 			int wlen;
 
+			printf("in sendrec\n");
 			buf = br_ssl_engine_sendrec_buf(ctx->engine, &len);
+			printf("after sendrec_buf\n");
 			wlen = ctx->low_write(ctx->write_context, buf, len);
 			if (wlen < 0) {
 				/*
@@ -118,10 +122,13 @@ run_until(br_sslio_context *ctx, unsigned target)
 			unsigned char *buf;
 			size_t len;
 			int rlen;
-
+			printf("in recvrec\n");
 			buf = br_ssl_engine_recvrec_buf(ctx->engine, &len);
+			printf("after recvrec_buf: %s\n", buf);
 			rlen = ctx->low_read(ctx->read_context, buf, len);
+			printf("after low_read\n");
 			if (rlen < 0) {
+				printf("br_sslio_read: %d\n", rlen);
 				br_ssl_engine_fail(ctx->engine, BR_ERR_IO);
 				return -1;
 			}
@@ -155,12 +162,16 @@ br_sslio_read(br_sslio_context *ctx, void *dst, size_t len)
 	if (run_until(ctx, BR_SSL_RECVAPP) < 0) {
 		return -1;
 	}
+	printf("after run_until\n");
 	buf = br_ssl_engine_recvapp_buf(ctx->engine, &alen);
 	if (alen > len) {
 		alen = len;
 	}
+	printf("before memcpy\n");
 	memcpy(dst, buf, alen);
+	printf("after memcpy\n");
 	br_ssl_engine_recvapp_ack(ctx->engine, alen);
+	printf("br_sslio_read: %d\n", (int)alen);
 	return (int)alen;
 }
 

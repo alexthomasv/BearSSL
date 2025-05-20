@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * GCM initialisation. This does everything except setting the vtable,
@@ -40,13 +41,13 @@ gen_gcm_init(br_sslrec_gcm_context *cc,
 
 	cc->seq = 0;
 	g_br_block_init(bc_impl->init, &cc->bc.vtable, key, key_len);
-	// bc_impl->init(&cc->bc.vtable, key, key_len);
+	bc_impl->init(&cc->bc.vtable, key, key_len);
 	cc->gh = gh_impl;
 	memcpy(cc->iv, iv, sizeof cc->iv);
 	memset(cc->h, 0, sizeof cc->h);
 	memset(tmp, 0, sizeof tmp);
 	// bc_impl->run(&cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
-	g_br_block_run(bc_impl->run, &cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
+	g_br_block_ctr_run(bc_impl->run, &cc->bc.vtable, tmp, 0, cc->h, sizeof cc->h);
 }
 
 void
@@ -120,8 +121,8 @@ do_ctr(br_sslrec_gcm_context *cc, const void *nonce, void *data, size_t len,
 
 	memcpy(iv, cc->iv, 4);
 	memcpy(iv + 4, nonce, 8);
-	g_br_block_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 2, data, len);
-	g_br_block_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 1, xortag, 16);
+	g_br_block_ctr_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 2, data, len);
+	g_br_block_ctr_run(cc->bc.vtable->run, &cc->bc.vtable, iv, 1, xortag, 16);
 	// cc->bc.vtable->run(&cc->bc.vtable, iv, 2, data, len);
 	// cc->bc.vtable->run(&cc->bc.vtable, iv, 1, xortag, 16);
 }

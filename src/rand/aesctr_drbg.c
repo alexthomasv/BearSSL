@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /* see bearssl_rand.h */
 void
@@ -77,7 +78,7 @@ br_aesctr_drbg_generate(br_aesctr_drbg_context *ctx, void *out, size_t len)
 		 * Run CTR.
 		 */
 		memset(buf, 0, clen);
-		ctx->cc = g_br_block_run(ctx->sk.vtable->run, &ctx->sk.vtable,
+		ctx->cc = g_br_block_ctr_run(ctx->sk.vtable->run, &ctx->sk.vtable,
 			iv, ctx->cc, buf, clen);
 		// ctx->cc = ctx->sk.vtable->run(&ctx->sk.vtable,
 		// 	iv, ctx->cc, buf, clen);
@@ -136,7 +137,7 @@ br_aesctr_drbg_update(br_aesctr_drbg_context *ctx, const void *seed, size_t len)
 	memset(iv, 0xFF, sizeof iv);
 	memset(s, 0, 16);
 
-	g_br_block_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
+	g_br_block_ctr_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
 	// ctx->sk.vtable->run(&ctx->sk.vtable, iv, 0xFFFFFFFF, s, 16);
 
 	/*
@@ -181,14 +182,14 @@ br_aesctr_drbg_update(br_aesctr_drbg_context *ctx, const void *seed, size_t len)
 		memcpy(iv, G, 12);
 		memcpy(newG, G, 16);
 
-		g_br_block_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
+		g_br_block_ctr_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
 			br_dec32be(G + 12), newG, 16);
 		// ctx->sk.vtable->run(&ctx->sk.vtable, iv,
 		// 	br_dec32be(G + 12), newG, 16);
 		iv[0] ^= 0x01;
 		memcpy(H, G, 16);
 		H[0] ^= 0x01;
-		g_br_block_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
+		g_br_block_ctr_run(ctx->sk.vtable->run, &ctx->sk.vtable, iv,
 			br_dec32be(G + 12), H, 16);
 		// ctx->sk.vtable->run(&ctx->sk.vtable, iv,
 		// 	br_dec32be(G + 12), H, 16);

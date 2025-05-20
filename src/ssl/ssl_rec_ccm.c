@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * CCM initialisation. This does everything except setting the vtable,

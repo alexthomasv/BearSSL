@@ -344,7 +344,7 @@
 	&& (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 25))) \
 	|| (defined __FreeBSD__ && __FreeBSD__ >= 12) \
 	|| defined __OpenBSD__
-#define BR_USE_GETENTROPY   0
+#define BR_USE_GETENTROPY   1
 #endif
 #endif
 

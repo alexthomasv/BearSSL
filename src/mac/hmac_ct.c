@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 static inline size_t
 hash_size(const br_hash_class *dig)
@@ -188,7 +189,7 @@ br_hmac_outCT(const br_hmac_context *ctx,
 	/*
 	 * Inner hash output is in tmp2[]; we finish processing.
 	 */
-	generic_hash_init(dig->init, &hc.vtable, ctx->kso, (uint64_t)bs);
+	generic_hash_init(dig->init, &hc.vtable);
 	generic_hash_set_state(dig->set_state, &hc.vtable, ctx->kso, (uint64_t)bs);
 	generic_hash_update(dig->update, &hc.vtable, tmp2, hlen);
 	generic_hash_out(dig->out, &hc.vtable, tmp2);

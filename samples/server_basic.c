@@ -223,6 +223,7 @@ accept_client(int server_fd)
 static int
 sock_read(void *ctx, unsigned char *buf, size_t len)
 {
+	printf("sock_read fd: %d\n", *(int *)ctx);
 	for (;;) {
 		ssize_t rlen;
 
@@ -231,6 +232,8 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 			if (rlen < 0 && errno == EINTR) {
 				continue;
 			}
+			printf("errno: %d\n", errno);
+			printf("sock_read: %d\n", (int)rlen);
 			return -1;
 		}
 		return (int)rlen;
@@ -291,6 +294,7 @@ main(int argc, char *argv[])
 	int fd;
 
 	if (argc != 2) {
+		printf("Did not provide port number\n");
 		return EXIT_FAILURE;
 	}
 	port = argv[1];
@@ -322,6 +326,8 @@ main(int argc, char *argv[])
 		if (cfd < 0) {
 			return EXIT_FAILURE;
 		}
+
+		printf("cfd: %d\n", cfd);
 
 		/*
 		 * Initialise the context with the cipher suites and
@@ -393,7 +399,9 @@ main(int argc, char *argv[])
 		/*
 		 * Initialise the simplified I/O wrapper context.
 		 */
+		printf("before br_sslio_init\n");
 		br_sslio_init(&ioc, &sc.eng, sock_read, &cfd, sock_write, &cfd);
+		printf("after br_sslio_init\n");
 
 		/*
 		 * Read bytes until two successive LF (or CR+LF) are received.
@@ -403,6 +411,7 @@ main(int argc, char *argv[])
 			unsigned char x;
 
 			if (br_sslio_read(&ioc, &x, 1) < 0) {
+				printf("client_drop\n");
 				goto client_drop;
 			}
 			if (x == 0x0D) {
