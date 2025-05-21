@@ -77,7 +77,10 @@ void g_append(void *fn_pointer, const br_x509_class **ctx,
 
 void g_end_cert(void *fn_pointer, const br_x509_class **ctx);
 
-void g_end_chain(void *fn_pointer, const br_x509_class **ctx);
+unsigned g_end_chain(void *fn_pointer, const br_x509_class **ctx);
+
+void g_prng_update(void *fn_pointer, const br_prng_class **ctx,
+		const void *seed, size_t seed_len);
 
 void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx);
 
@@ -336,7 +339,19 @@ ec_prime_i31_api_order(int curve, size_t *len);
 extern size_t
 ec_prime_i31_api_xoff(int curve, size_t *len);
 
+extern int
+sock_read(void *ctx, unsigned char *buf, size_t len);
 
+extern int
+sock_write(void *ctx, const unsigned char *buf, size_t len);
 
+extern void xm_start_chain(const br_x509_class **ctx, const char *server_name);
 
+extern void xm_start_cert(const br_x509_class **ctx, uint32_t length);
+
+extern void xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len);
+
+extern void xm_end_cert(const br_x509_class **ctx);
+
+extern unsigned xm_end_chain(const br_x509_class **ctx);
 #endif /* GENERIC_WRAPPERS_H */

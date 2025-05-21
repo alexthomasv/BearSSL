@@ -218,22 +218,22 @@ void br_x509_minimal_run(void *ctx);
  */
 
 /* see bearssl_x509.h */
-static void
+void
 xm_start_chain(const br_x509_class **ctx, const char *server_name);
 
-static void
+void
 xm_start_cert(const br_x509_class **ctx, uint32_t length);
 
-static void
+void
 xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len);
 
-static void
+void
 xm_end_cert(const br_x509_class **ctx);
 
-static unsigned
+unsigned
 xm_end_chain(const br_x509_class **ctx);
 
-static const br_x509_pkey *
+const br_x509_pkey *
 xm_get_pkey(const br_x509_class *const *ctx, unsigned *usages);
 
 void
@@ -248,9 +248,10 @@ br_x509_minimal_init(br_x509_minimal_context *ctx,
 	ctx->trust_anchors_num = trust_anchors_num;
 }
 
-static void
+void
 xm_start_chain(const br_x509_class **ctx, const char *server_name)
 {
+	printf("[xm_start_chain]\n");
 	br_x509_minimal_context *cc;
 	size_t u;
 
@@ -259,20 +260,24 @@ xm_start_chain(const br_x509_class **ctx, const char *server_name)
 		cc->name_elts[u].status = 0;
 		cc->name_elts[u].buf[0] = 0;
 	}
+	printf("cc->num_name_elts: %zu\n", cc->num_name_elts);
 	memset(&cc->pkey, 0, sizeof cc->pkey);
+	printf("cc->pkey: %p\n", &cc->pkey);
 	cc->num_certs = 0;
 	cc->err = 0;
 	cc->cpu.dp = cc->dp_stack;
 	cc->cpu.rp = cc->rp_stack;
 	br_x509_minimal_init_main(&cc->cpu);
+	printf("cc->cpu.dp: %p\n", cc->cpu.dp);
 	if (server_name == NULL || *server_name == 0) {
 		cc->server_name = NULL;
 	} else {
 		cc->server_name = server_name;
 	}
+	printf("[xm_start_chain] end\n");
 }
 
-static void
+void
 xm_start_cert(const br_x509_class **ctx, uint32_t length)
 {
 	br_x509_minimal_context *cc;
@@ -288,7 +293,7 @@ xm_start_cert(const br_x509_class **ctx, uint32_t length)
 	cc->cert_length = length;
 }
 
-static void
+void
 xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len)
 {
 	br_x509_minimal_context *cc;
@@ -302,7 +307,7 @@ xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len)
 	br_x509_minimal_run(&cc->cpu);
 }
 
-static void
+void
 xm_end_cert(const br_x509_class **ctx)
 {
 	br_x509_minimal_context *cc;
@@ -314,7 +319,7 @@ xm_end_cert(const br_x509_class **ctx)
 	cc->num_certs ++;
 }
 
-static unsigned
+unsigned
 xm_end_chain(const br_x509_class **ctx)
 {
 	printf("[xm_end_chain]\n");
@@ -333,7 +338,7 @@ xm_end_chain(const br_x509_class **ctx)
 	return (unsigned)cc->err;
 }
 
-static const br_x509_pkey *
+const br_x509_pkey *
 xm_get_pkey(const br_x509_class *const *ctx, unsigned *usages)
 {
 	br_x509_minimal_context *cc;

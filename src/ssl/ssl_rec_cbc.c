@@ -349,35 +349,37 @@ cbc_encrypt(br_sslrec_out_cbc_context *cc,
 		br_hmac_update(&hc, tmp, 8);
 		br_hmac_out(&hc, buf - blen);
 		rbuf = buf - blen - 5;
-	} else {
-		if (len > 1 && record_type == BR_SSL_APPLICATION_DATA) {
-			/*
-			 * To do the split, we use a recursive invocation;
-			 * since we only give one byte to the inner call,
-			 * the recursion stops there.
-			 *
-			 * We need to compute the exact size of the extra
-			 * record, so that the two resulting records end up
-			 * being sequential in RAM.
-			 *
-			 * We use here the fact that cbc_max_plaintext()
-			 * adjusted the start offset to leave room for the
-			 * initial fragment.
-			 */
-			size_t xlen;
+	} 
+	// Ignore splitting (recursion required + it's only relevant for TLS 1.0)
+	// else {
+	// 	if (len > 1 && record_type == BR_SSL_APPLICATION_DATA) {
+	// 		/*
+	// 		 * To do the split, we use a recursive invocation;
+	// 		 * since we only give one byte to the inner call,
+	// 		 * the recursion stops there.
+	// 		 *
+	// 		 * We need to compute the exact size of the extra
+	// 		 * record, so that the two resulting records end up
+	// 		 * being sequential in RAM.
+	// 		 *
+	// 		 * We use here the fact that cbc_max_plaintext()
+	// 		 * adjusted the start offset to leave room for the
+	// 		 * initial fragment.
+	// 		 */
+	// 		size_t xlen;
 
-			rbuf = buf - 4
-				- ((cc->mac_len + blen + 1) & ~(blen - 1));
-			rbuf[0] = buf[0];
-			xlen = 1;
-			rbuf = cbc_encrypt(cc, record_type,
-				version, rbuf, &xlen);
-			buf ++;
-			len --;
-		} else {
-			rbuf = buf - 5;
-		}
-	}
+	// 		rbuf = buf - 4
+	// 			- ((cc->mac_len + blen + 1) & ~(blen - 1));
+	// 		rbuf[0] = buf[0];
+	// 		xlen = 1;
+	// 		rbuf = cbc_encrypt(cc, record_type,
+	// 			version, rbuf, &xlen);
+	// 		buf ++;
+	// 		len --;
+	// 	} else {
+	// 		rbuf = buf - 5;
+	// 	}
+	// }
 
 	/*
 	 * Compute MAC.

@@ -1932,7 +1932,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	xc = *(ENG->x509ctx);
 	// xc->end_cert(ENG->x509ctx);
-	g_end_cert(xc->end_cert, xc);
+	g_end_cert(xc->end_cert, ENG->x509ctx);
 
 				}
 				break;
@@ -1942,7 +1942,8 @@ br_ssl_hs_client_run(void *t0ctx)
 	const br_x509_class *xc;
 
 	xc = *(ENG->x509ctx);
-	T0_PUSH(xc->end_chain(ENG->x509ctx));
+	// T0_PUSH(xc->end_chain(ENG->x509ctx));
+	T0_PUSH(g_end_chain(xc->end_chain, ENG->x509ctx));
 	printf("x509-end-chain: %d\n", T0_PEEK(0));
 
 				}
@@ -1955,7 +1956,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	xc = *(ENG->x509ctx);
 	// xc->start_cert(ENG->x509ctx, T0_POP());
-	g_start_cert(xc->start_cert, xc, T0_POP());
+	g_start_cert(xc->start_cert, ENG->x509ctx, T0_POP());
 
 
 				}
@@ -1971,7 +1972,7 @@ br_ssl_hs_client_run(void *t0ctx)
 	bc = T0_POP();
 	xc = *(ENG->x509ctx);
 	// xc->start_chain(ENG->x509ctx, bc ? ENG->server_name : NULL);
-	g_start_chain(xc->start_chain, xc, bc ? ENG->server_name : NULL);
+	g_start_chain(xc->start_chain, ENG->x509ctx, bc ? ENG->server_name : NULL);
 
 				}
 				break;

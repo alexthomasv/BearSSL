@@ -1,5 +1,9 @@
 #include "bearssl.h"
 #include "ct-verif.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include "g_header.h"
 
 /*
  * The hardcoded trust anchors. These are the two DN + public key that
@@ -89,14 +93,41 @@ static const br_x509_trust_anchor TAs[2] = {
 int
 sock_read(void *ctx, unsigned char *buf, size_t len)
 {
-    return 0;
+	for (;;) {
+		ssize_t rlen;
+
+		rlen = read(*(int *)ctx, buf, len);
+		if (rlen <= 0) {
+			if (rlen < 0 && errno == EINTR) {
+				continue;
+			}
+			return -1;
+		}
+		return (int)rlen;
+	}
 }
 
 int
 sock_write(void *ctx, const unsigned char *buf, size_t len)
 {
-    return 0;
+	printf("real_sock_write: fd: %d\n", *(int *)ctx);
+	printf("real_sock_write: len: %zu\n", len);
+	for (;;) {
+		ssize_t wlen;
+
+		wlen = write(*(int *)ctx, buf, len);
+		printf("real_sock_write: wlen: %d\n", wlen);
+		if (wlen <= 0) {
+			if (wlen < 0 && errno == EINTR) {
+				continue;
+			}
+			printf("real_sock_write: error: %d\n", errno);
+			return -1;
+		}
+		return (int)wlen;
+	}
 }
+
 
 int br_sslio_write_all_wrapper(unsigned char *ioc, unsigned char *src, size_t len) {
     __SMACK_values(ioc, 40);
@@ -130,48 +161,10 @@ void br_sslio_read_all_wrapper(void *ctx, void *dst, size_t len) {
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <errno.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <bearssl.h>
-
-static int
-real_sock_read(void *ctx, unsigned char *buf, size_t len)
-{
-	for (;;) {
-		ssize_t rlen;
-
-		rlen = read(*(int *)ctx, buf, len);
-		if (rlen <= 0) {
-			if (rlen < 0 && errno == EINTR) {
-				continue;
-			}
-			return -1;
-		}
-		return (int)rlen;
-	}
-}
-
-static int
-real_sock_write(void *ctx, const unsigned char *buf, size_t len)
-{
-	printf("real_sock_write: fd: %d\n", *(int *)ctx);
-	printf("real_sock_write: len: %zu\n", len);
-	for (;;) {
-		ssize_t wlen;
-
-		wlen = write(*(int *)ctx, buf, len);
-		printf("real_sock_write: wlen: %d\n", wlen);
-		if (wlen <= 0) {
-			if (wlen < 0 && errno == EINTR) {
-				continue;
-			}
-			printf("real_sock_write: error: %d\n", errno);
-			return -1;
-		}
-		return (int)wlen;
-	}
-}
 
 /* ---------- helper: stringify engine state bits ------------------- */
 static const char *
@@ -351,7 +344,7 @@ void main() {
 	br_ssl_client_init_full(&sc, &xc, TAs, TAs_NUM);
 	br_ssl_engine_set_buffer(&sc.eng, iobuf, sizeof iobuf, 1);
     br_ssl_client_reset(&sc, host, 0);
-	br_sslio_init(&ioc, &sc.eng, real_sock_read, &fd, real_sock_write, &fd);
+	br_sslio_init(&ioc, &sc.eng, sock_read, &fd, sock_write, &fd);
 
     dump_ssl_client(&sc);
     dump_x509_minimal(&xc);

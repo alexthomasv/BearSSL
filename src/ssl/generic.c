@@ -94,16 +94,17 @@ br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
 	const br_ec_public_key *pk, const void *sig, size_t sig_len);
 
 extern int
-sock_read(int fd, void *buf, size_t count);
+sock_read(void *ctx, unsigned char *buf, size_t len);
 
 extern int
-sock_write(int fd, const void *buf, size_t count);
+sock_write(void *ctx, const unsigned char *buf, size_t len);
 
 int g_read(void* fn_pointer, void *read_context,
 		unsigned char *data, size_t len){
 	if (fn_pointer == &sock_read) {
 		return sock_read(read_context, data, len);
 	} else {
+		printf("g_read: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -111,79 +112,114 @@ int g_read(void* fn_pointer, void *read_context,
 int g_write(void* fn_pointer, void *write_context,
 		unsigned char *data, size_t len){
 	if (fn_pointer == &sock_write) {
-		return sock_read(write_context, data, len);
+		return sock_write(write_context, data, len);
 	} else {
+		printf("g_write: %p\n", fn_pointer);
 		abort();
 	}
 }
 
 size_t g_do_sign(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		int hash_id, size_t hv_len, unsigned char *data, size_t len){
+	printf("g_do_sign: %p\n", fn_pointer);
 	abort();
 }
 
 uint32_t g_mul(void *fn_pointer, unsigned char *G, size_t Glen,
 		const unsigned char *x, size_t xlen, int curve){
+	printf("g_mul: %p\n", fn_pointer);
 	abort();
 }
 
 size_t g_mulgen(void *fn_pointer, unsigned char *R,
 		const unsigned char *x, size_t xlen, int curve){
+	printf("g_mulgen: %p\n", fn_pointer);
 	abort();
 }
 
 const unsigned char *g_order(void *fn_pointer, int curve, size_t *len){
+	printf("g_order: %p\n", fn_pointer);
 	abort();
 }
 
 size_t g_xoff(void *fn_pointer, int curve, size_t *len){
+	printf("g_xoff: %p\n", fn_pointer);
 	abort();
 }
 
 uint32_t g_irsavrfy(void *fn_pointer, const unsigned char *x, size_t xlen,
 	const unsigned char *hash_oid, size_t hash_len,
 	const br_rsa_public_key *pk, unsigned char *hash_out){
+	printf("g_irsavrfy: %p\n", fn_pointer);
 	abort();
 }
 
 const br_x509_pkey *g_get_pkey(void *fn_pointer,
 		const br_x509_class *const *ctx, unsigned *usages){
+	printf("g_get_pkey: %p\n", fn_pointer);
 	abort();
 }
 
 void g_prf(void *fn_pointer, void *dst, size_t len,
 	const void *secret, size_t secret_len, const char *label,
 	size_t seed_num, const br_tls_prf_seed_chunk *seed){
+	printf("g_prf: %p\n", fn_pointer);
 	abort();
 }
 
 void g_choose(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		const br_ssl_client_context *cc, uint32_t auth_types,
 		br_ssl_client_certificate *choices){
+	printf("g_choose: %p\n", fn_pointer);
 	abort();
 }
 
 void g_start_chain(void *fn_pointer, const br_x509_class **ctx,
 		const char *server_name){
-	abort();
+	if (fn_pointer == &xm_start_chain) {
+		xm_start_chain(ctx, server_name);
+	} else {
+		printf("g_start_chain: %p\n", fn_pointer);
+		abort();
+	}
 }
 
 void g_start_cert(void *fn_pointer, const br_x509_class **ctx,
 		uint32_t cert_type){
-	abort();
+	if (fn_pointer == &xm_start_cert) {
+		xm_start_cert(ctx, cert_type);
+	} else {
+		printf("g_start_cert: %p\n", fn_pointer);
+		abort();
+	}
 }
 
 void g_append(void *fn_pointer, const br_x509_class **ctx,
 		const void *data, size_t len){
-	abort();
+	if (fn_pointer == &xm_append) {
+		xm_append(ctx, data, len);
+	} else {
+		printf("g_append: %p\n", fn_pointer);
+		abort();
+	}
 }
 
 void g_end_cert(void *fn_pointer, const br_x509_class **ctx){
-	abort();
+	if (fn_pointer == &xm_end_cert) {
+		xm_end_cert(ctx);
+	} else {
+		printf("g_end_cert: %p\n", fn_pointer);
+		abort();
+	}
 }
 
-void g_end_chain(void *fn_pointer, const br_x509_class **ctx){
-	abort();
+unsigned g_end_chain(void *fn_pointer, const br_x509_class **ctx){
+	if (fn_pointer == &xm_end_chain) {
+		return xm_end_chain(ctx);
+	} else {
+		printf("g_end_chain: %p\n", fn_pointer);
+		abort();
+	}
 }
 
 void generic_max_plaintext(void *fn_pointer, const br_sslrec_out_class *const *ctx, size_t *start, size_t *end)
@@ -248,8 +284,8 @@ unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx
 	printf("generic_encrypt: %p\n", fn_pointer);
 	if (fn_pointer == &clear_encrypt) {
 		return clear_encrypt(ctx, record_type, version, plaintext, len);
-	} else if (fn_pointer == &cbc_encrypt) {
-		return cbc_encrypt(ctx, record_type, version, plaintext, len);
+	// } else if (fn_pointer == &cbc_encrypt) {
+	// 	return cbc_encrypt(ctx, record_type, version, plaintext, len);
 	} else if (fn_pointer == &gcm_encrypt) {
 		return gcm_encrypt(ctx, record_type, version, plaintext, len);
 	} else if (fn_pointer == &ccm_encrypt) {
@@ -293,6 +329,7 @@ uint32_t generic_chacha(void *fn_pointer, const void *key,
 	if (fn_pointer == &br_chacha20_ct_run) {
 		return br_chacha20_ct_run(key, iv, cc, data, len);
 	} else {
+		printf("generic_chacha: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -301,6 +338,7 @@ void generic_ghash(void *fn_pointer, void *y, const void *h, const void *data, s
 	if (fn_pointer == &br_ghash_ctmul) {
 		br_ghash_ctmul64(y, h, data, len);
 	} else {
+		printf("generic_ghash: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -310,6 +348,7 @@ void g_br_block_init(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 	if (fn_pointer == &br_aes_ct64_ctrcbc_init) {
 		br_aes_ct64_ctrcbc_init(ctx, key, key_len);
 	} else {
+		printf("g_br_block_init: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -319,6 +358,7 @@ void g_br_block_encrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 	if (fn_pointer == &br_aes_ct64_ctrcbc_encrypt) {
 		br_aes_ct64_ctrcbc_encrypt(ctx, ctr, cbcmac, data, len);
 	} else {
+		printf("g_br_block_encrypt: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -328,6 +368,7 @@ void g_br_block_decrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 	if (fn_pointer == &br_aes_ct64_ctrcbc_decrypt) {
 		br_aes_ct64_ctrcbc_decrypt(ctx, ctr, cbcmac, data, len);
 	} else {
+		printf("g_br_block_decrypt: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -337,6 +378,7 @@ void g_br_block_ctr(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 	if (fn_pointer == &br_aes_ct64_ctrcbc_ctr) {
 		br_aes_ct64_ctrcbc_ctr(ctx, ctr, data, len);
 	} else {
+		printf("g_br_block_ctr: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -346,6 +388,7 @@ void g_br_block_mac(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 	if (fn_pointer == &br_aes_ct64_ctrcbc_mac) {
 		br_aes_ct64_ctrcbc_mac(ctx, cbcmac, data, len);
 	} else {
+		printf("g_br_block_mac: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -364,6 +407,7 @@ void generic_hash_init(void *fn_pointer, const br_hash_class **ctx){
 	} else if (fn_pointer == &br_sha512_init) {
 		br_sha512_init(ctx);
 	} else {
+		printf("generic_hash_init: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -382,6 +426,7 @@ void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, cons
 	} else if (fn_pointer == &br_sha512_update) {
 		br_sha512_update(ctx, data, len);
 	} else {
+		printf("generic_hash_update: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -400,6 +445,7 @@ void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *d
 	} else if (fn_pointer == &br_sha512_out) {
 		br_sha512_out(ctx, dst);
 	} else {
+		printf("generic_hash_out: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -418,6 +464,7 @@ uint64_t generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, v
 	} else if (fn_pointer == &br_sha512_state) {
 		return br_sha512_state(ctx, out);
 	} else {
+		printf("generic_hash_state: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -436,6 +483,7 @@ void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, v
 	} else if (fn_pointer == &br_sha512_set_state) {
 		br_sha512_set_state(ctx, stb, count);
 	} else {
+		printf("generic_set_state: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -450,6 +498,7 @@ int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_
 	} else if (fn_pointer == &chapol_check_length) {
 		return chapol_check_length(ctx, len);
 	} else {
+		printf("generic_check_length: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -466,16 +515,19 @@ uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char 
 	} else if (fn_pointer == &ec_c_25519_m31_api_muladd) {
 		return ec_c_25519_m31_api_muladd(A, B, len, x, xlen, y, ylen, curve);
 	} else {
+		printf("generic_muladd: %p\n", fn_pointer);
 		abort();
 	}
 }
 
 void g_generator(void *fn_pointer, int curve, size_t *len){
+	printf("g_generator: %p\n", fn_pointer);
 	abort();
 }
 
 uint32_t g_do_keyx(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		unsigned char *data, size_t *len){
+	printf("g_do_keyx: %p\n", fn_pointer);
 	abort();
 }
 
@@ -485,6 +537,7 @@ uint32_t g_iecdsa(void *fn_pointer, const br_ec_impl *impl,
 	if (fn_pointer == &br_ecdsa_i31_vrfy_asn1) {
 		return br_ecdsa_i31_vrfy_asn1(impl, hash, hash_len, pk, sig, sig_len);
 	} else {
+		printf("g_iecdsa: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -495,6 +548,7 @@ uint32_t g_irsa(void *fn_pointer, const br_ec_impl *impl,
 	if (fn_pointer == &br_rsa_i31_pkcs1_vrfy) {
 		return br_rsa_i31_pkcs1_vrfy(impl, hash, hash_len, pk, sig, sig_len);
 	} else {
+		printf("g_irsa: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -504,6 +558,7 @@ void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx){
 	if (fn_pointer == &br_sha256_init) {
 		br_sha256_init(ctx);
 	} else {
+		printf("br_hash_dn_init: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -512,6 +567,7 @@ void br_hash_dn_update(void *fn_pointer, const br_hash_class *const *ctx, const 
 	if (fn_pointer == &br_sha256_update) {
 		br_sha256_update(ctx, data, len);
 	} else {
+		printf("br_hash_dn_update: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -520,6 +576,7 @@ void br_hash_dn_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst
 	if (fn_pointer == &br_sha256_out) {
 		br_sha256_out(ctx, dst);
 	} else {
+		printf("br_hash_dn_out: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -528,6 +585,7 @@ void br_hash_dn_state(void *fn_pointer, const br_hash_class *const *ctx, void *o
 	if (fn_pointer == &br_sha256_state) {
 		br_sha256_state(ctx, out);
 	} else {
+		printf("br_hash_dn_state: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -536,6 +594,7 @@ void br_hash_dn_set_state(void *fn_pointer, const br_hash_class *const *ctx, voi
 	if (fn_pointer == &br_sha256_set_state) {
 		br_sha256_set_state(ctx, stb, count);
 	} else {
+		printf("br_hash_dn_set_state: %p\n", fn_pointer);
 		abort();
 	}
 }
@@ -559,27 +618,43 @@ void generic_prf(void *fn_pointer, void *prf, void *dst, size_t len,
 	if (fn_pointer == &br_tls10_prf) {
 		br_tls10_prf(dst, len, secret, secret_len, label, seed_num, seed);
 	} else {
+		printf("generic_prf: %p\n", fn_pointer);
 		abort();
 	}
 }
 
 void g_append_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		const unsigned char *data, size_t len){
+	printf("g_append_name: %p\n", fn_pointer);
 	abort();
 }
 
 void g_start_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
+	printf("g_start_name_list: %p\n", fn_pointer);
 	abort();
 }
 
 void g_end_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
+	printf("g_end_name_list: %p\n", fn_pointer);
 	abort();
 }
 
 void g_start_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx, size_t len){
+	printf("g_start_name: %p\n", fn_pointer);
 	abort();
 }
 
 void g_end_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
+	printf("g_end_name: %p\n", fn_pointer);
 	abort();
+}
+
+void g_prng_update(void *fn_pointer, const br_prng_class **ctx,
+		const void *seed, size_t seed_len){
+	if (fn_pointer == &br_hmac_drbg_update) {
+		br_hmac_drbg_update(ctx, seed, seed_len);
+	} else {
+		printf("g_prng_update: %p\n", fn_pointer);
+		abort();
+	}
 }

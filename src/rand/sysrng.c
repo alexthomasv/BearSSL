@@ -24,6 +24,7 @@
 
 #define BR_ENABLE_INTRINSICS   0
 #include "inner.h"
+#include "g_header.h"
 
 #if BR_USE_GETENTROPY
 #include <unistd.h>
@@ -152,7 +153,8 @@ seeder_getentropy(const br_prng_class **ctx)
 	unsigned char tmp[32];
 
 	if (getentropy(tmp, sizeof tmp) == 0) {
-		(*ctx)->update(ctx, tmp, sizeof tmp);
+		g_prng_update((*ctx)->update, ctx, tmp, sizeof tmp);
+		// (*ctx)->update(ctx, tmp, sizeof tmp);
 		return 1;
 	}
 #if BR_USE_URANDOM
