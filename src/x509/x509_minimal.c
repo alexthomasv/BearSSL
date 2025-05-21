@@ -317,6 +317,7 @@ xm_end_cert(const br_x509_class **ctx)
 static unsigned
 xm_end_chain(const br_x509_class **ctx)
 {
+	printf("[xm_end_chain]\n");
 	br_x509_minimal_context *cc;
 
 	cc = (br_x509_minimal_context *)(void *)ctx;
@@ -1230,9 +1231,10 @@ br_x509_minimal_run(void *t0ctx)
 	uint32_t nad = T0_POP();
 	int r;
 	if (CTX->itime != 0) {
-		r = 0;
-		// r = CTX->itime(CTX->itime_ctx, nbd, nbs, nad, nas);
+		// r = 0;
+		r = CTX->itime(CTX->itime_ctx, nbd, nbs, nad, nas);
 		if (r < -1 || r > 1) {
+			printf("[check-validity-range] r: %d\n", r);
 			CTX->err = BR_ERR_X509_TIME_UNKNOWN;
 			T0_CO();
 		}

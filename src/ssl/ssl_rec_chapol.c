@@ -24,6 +24,33 @@
 
 #include "inner.h"
 #include "g_header.h"
+
+static void
+dump_chunk(const void *p, size_t len)
+{
+    const unsigned char *v = p;
+    for (size_t i = 0; i < len; i += 16) {
+        /* print offset */
+        printf("  %04zx  ", i);
+
+        /* hex part */
+        for (size_t j = 0; j < 16; j++) {
+            if (i + j < len)
+                printf("%02x ", v[i + j]);
+            else
+                printf("   ");
+        }
+
+        /* ASCII part */
+        printf(" ");
+        for (size_t j = 0; j < 16 && i + j < len; j++) {
+            unsigned char c = v[i + j];
+            putchar((c >= 32 && c <= 126) ? c : '.');
+        }
+        putchar('\n');
+    }
+}
+
 static void
 gen_chapol_init(br_sslrec_chapol_context *cc,
 	br_chacha20_run ichacha, br_poly1305_run ipoly,
@@ -90,6 +117,8 @@ chapol_decrypt(br_sslrec_chapol_context *cc,
 	unsigned char tag[16];
 	unsigned bad;
 
+	dump_chunk(data, *data_len);
+
 	buf = data;
 	len = *data_len - 16;
 	gen_chapol_process(cc, record_type, version, buf, len, tag, 0);
@@ -101,6 +130,7 @@ chapol_decrypt(br_sslrec_chapol_context *cc,
 		return NULL;
 	}
 	*data_len = len;
+	dump_chunk(data, *data_len);
 	return buf;
 }
 
@@ -129,7 +159,7 @@ out_chapol_init(br_sslrec_chapol_context *cc,
 	gen_chapol_init(cc, ichacha, ipoly, key, iv);
 }
 
-static void
+void
 chapol_max_plaintext(const br_sslrec_chapol_context *cc,
 	size_t *start, size_t *end)
 {
@@ -147,6 +177,7 @@ unsigned char *
 chapol_encrypt(br_sslrec_chapol_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
+	printf("chapol_encrypt\n");
 	unsigned char *buf;
 	size_t len;
 
@@ -154,10 +185,12 @@ chapol_encrypt(br_sslrec_chapol_context *cc,
 	len = *data_len;
 	gen_chapol_process(cc, record_type, version, buf, len, buf + len, 1);
 	buf -= 5;
+	dump_chunk(buf, len);
 	buf[0] = (unsigned char)record_type;
 	br_enc16be(buf + 1, version);
 	br_enc16be(buf + 3, len + 16);
 	*data_len = len + 21;
+	dump_chunk(data, *data_len);
 	return buf;
 }
 

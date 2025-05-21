@@ -150,6 +150,7 @@ br_poly1305_ctmul_run(const void *key, const void *iv,
 	void *data, size_t len, const void *aad, size_t aad_len,
 	void *tag, br_chacha20_run ichacha, int encrypt)
 {
+	printf("br_poly1305_ctmul_run\n");
 	unsigned char pkey[32], foot[16];
 	uint32_t r[5], acc[5], cc, ctl, hi;
 	uint64_t w;

@@ -66,6 +66,19 @@ void generic_ghash(void *fn_ptr,
         void *y, const void *h,
         const void *data, size_t len);
 
+void g_start_chain(void *fn_pointer, const br_x509_class **ctx,
+		const char *server_name);
+
+void g_start_cert(void *fn_pointer, const br_x509_class **ctx,
+		uint32_t cert_type);
+
+void g_append(void *fn_pointer, const br_x509_class **ctx,
+		const void *data, size_t len);
+
+void g_end_cert(void *fn_pointer, const br_x509_class **ctx);
+
+void g_end_chain(void *fn_pointer, const br_x509_class **ctx);
+
 void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx);
 
 void br_hash_dn_update(void *fn_pointer, const br_hash_class *const *ctx,
@@ -151,6 +164,55 @@ uint32_t generic_irsa(void *fn_ptr,
 
 void generic_hs_run(void *fn_pointer, void *cc);
 
+void g_prf(void *fn_pointer, void *dst, size_t len,
+	const void *secret, size_t secret_len, const char *label,
+	size_t seed_num, const br_tls_prf_seed_chunk *seed);
+
+int g_read(void* fn_pointer, void *read_context,
+		unsigned char *data, size_t len);
+
+int g_write(void* fn_pointer, void *write_context,
+		unsigned char *data, size_t len);
+
+void g_choose(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
+		const br_ssl_client_context *cc, uint32_t auth_types,
+		br_ssl_client_certificate *choices);
+
+uint32_t g_do_keyx(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
+		unsigned char *data, size_t *len);
+
+const unsigned char *g_order(void *fn_pointer, int curve, size_t *len);
+
+size_t g_do_sign(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
+		int hash_id, size_t hv_len, unsigned char *data, size_t len);
+
+void g_append_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
+		const unsigned char *data, size_t len);
+
+void g_start_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx);
+
+void g_end_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx);
+
+void g_start_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx, size_t len);
+
+void g_end_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx);
+
+void g_generator(void *fn_pointer, int curve, size_t *len);
+
+uint32_t g_mul(void *fn_pointer, unsigned char *G, size_t Glen,
+		const unsigned char *x, size_t xlen, int curve);
+
+size_t g_mulgen(void *fn_pointer, unsigned char *R,
+		const unsigned char *x, size_t xlen, int curve);
+
+size_t g_xoff(void *fn_pointer, int curve, size_t *len);
+
+uint32_t g_irsavrfy(void *fn_pointer, const unsigned char *x, size_t xlen,
+	const unsigned char *hash_oid, size_t hash_len,
+	const br_rsa_public_key *pk, unsigned char *hash_out);
+
+const br_x509_pkey *g_get_pkey(void *fn_pointer,
+		const br_x509_class *const *ctx, unsigned *usages);
 
 // Needed for ssl_engine.c
 extern void in_ccm_init(br_sslrec_ccm_context *cc,

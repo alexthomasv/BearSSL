@@ -133,7 +133,7 @@ out_ccm_init(br_sslrec_ccm_context *cc,
 	gen_ccm_init(cc, bc_impl, key, key_len, iv, tag_len);
 }
 
-static void
+void
 ccm_max_plaintext(const br_sslrec_ccm_context *cc,
 	size_t *start, size_t *end)
 {

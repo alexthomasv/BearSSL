@@ -317,6 +317,7 @@ make_ready_out(br_ssl_engine_context *rc)
 
 	a = 5;
 	b = rc->obuf_len - a;
+	printf("generic_max_plaintext\n");
 	generic_max_plaintext((void *) rc->out.vtable->max_plaintext, &rc->out.vtable, &a, &b);
 	// rc->out.vtable->max_plaintext(&rc->out.vtable, &a, &b);
 	if ((b - a) > rc->max_frag_len) {
@@ -758,6 +759,7 @@ recvrec_ack(br_ssl_engine_context *rc, size_t len)
 	// pbuf = rc->in.vtable->decrypt(&rc->in.vtable,
 	// 	rc->record_type_in, rc->version_in, rc->ibuf + 5, &pbuf_len);
 	if (pbuf == 0) {
+		printf("pbuf == 0\n");
 		br_ssl_engine_fail(rc, BR_ERR_BAD_MAC);
 		return;
 	}
@@ -933,6 +935,7 @@ sendrec_ack(br_ssl_engine_context *rc, size_t len)
 static inline int
 has_rec_tosend(const br_ssl_engine_context *rc)
 {
+	printf("has_rec_tosend\n");
 	return rc->oxa == rc->oxb && rc->oxa != rc->oxc;
 }
 
@@ -1100,6 +1103,7 @@ jump_handshake(br_ssl_engine_context *cc, int action)
 		// cc->hsrun(&cc->cpu);
 		printf("after generic hs run\n");
 		if (br_ssl_engine_closed(cc)) {
+			printf("in jump_handshake, closed\n");
 			return;
 		}
 		if (cc->hbuf_out != cc->saved_hbuf_out) {
@@ -1207,8 +1211,10 @@ br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len)
 {
 	unsigned char *buf;
 
+	printf("[br_ssl_engine_recvrec_ack] in recvrec_ack\n");
 	recvrec_ack(cc, len);
 	if (br_ssl_engine_closed(cc)) {
+		printf("[br_ssl_engine_recvrec_ack] in recvrec_ack, closed\n");
 		return;
 	}
 
@@ -1219,6 +1225,7 @@ br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len)
 	 */
 	buf = recvpld_buf(cc, &len);
 	if (buf != NULL) {
+		printf("[cc->record_type_in: %d]\n", cc->record_type_in);
 		switch (cc->record_type_in) {
 		case BR_SSL_CHANGE_CIPHER_SPEC:
 		case BR_SSL_ALERT:
@@ -1296,6 +1303,7 @@ br_ssl_engine_current_state(const br_ssl_engine_context *cc)
 	size_t len;
 
 	if (br_ssl_engine_closed(cc)) {
+		printf("[br_ssl_engine_current_state] in closed\n");
 		return BR_SSL_CLOSED;
 	}
 
@@ -1387,9 +1395,12 @@ compute_key_block(br_ssl_engine_context *cc, int prf_id,
 	};
 
 	iprf = br_ssl_engine_get_PRF(cc, prf_id);
-	iprf(kb, half_len << 1,
+	g_prf(iprf, kb, half_len << 1,
 		cc->session.master_secret, sizeof cc->session.master_secret,
 		"key expansion", 2, seed);
+	// iprf(kb, half_len << 1,
+	// 	cc->session.master_secret, sizeof cc->session.master_secret,
+	// 	"key expansion", 2, seed);
 }
 
 /* see inner.h */

@@ -290,7 +290,7 @@ out_cbc_init(br_sslrec_out_cbc_context *cc,
 	}
 }
 
-static void
+void
 cbc_max_plaintext(const br_sslrec_out_cbc_context *cc,
 	size_t *start, size_t *end)
 {
@@ -314,6 +314,7 @@ unsigned char *
 cbc_encrypt(br_sslrec_out_cbc_context *cc,
 	int record_type, unsigned version, void *data, size_t *data_len)
 {
+	printf("cbc_encrypt\n");
 	unsigned char *buf, *rbuf;
 	size_t len, blen, plen;
 	unsigned char tmp[13];

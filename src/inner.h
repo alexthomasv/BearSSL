@@ -440,7 +440,7 @@
 #if defined __unix__ || defined __linux__ \
 	|| defined _POSIX_SOURCE || defined _POSIX_C_SOURCE \
 	|| (defined __APPLE__ && defined __MACH__)
-#define BR_USE_UNIX_TIME   0
+#define BR_USE_UNIX_TIME   1
 #endif
 #endif
 

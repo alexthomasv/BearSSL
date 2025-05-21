@@ -86,13 +86,13 @@ static const br_x509_trust_anchor TAs[2] = {
 };
 #define TAs_NUM   2
 
-static int
+int
 sock_read(void *ctx, unsigned char *buf, size_t len)
 {
     return 0;
 }
 
-static int
+int
 sock_write(void *ctx, const unsigned char *buf, size_t len)
 {
     return 0;
@@ -109,10 +109,8 @@ int br_sslio_write_all_wrapper(unsigned char *ioc, unsigned char *src, size_t le
 	const char *host = "www.google.com";
 
     br_ssl_client_init_full(&sc, &xc, TAs, TAs_NUM);
-
 	br_ssl_engine_set_buffer(&sc.eng, iobuf, sizeof iobuf, 1);
-
-	// br_ssl_client_reset(&sc, host, 0);
+	br_ssl_client_reset(&sc, host, 0);
     
     br_sslio_init(ioc, &sc.eng, sock_read, &fd, sock_write, &fd);
 
@@ -355,16 +353,17 @@ void main() {
     br_ssl_client_reset(&sc, host, 0);
 	br_sslio_init(&ioc, &sc.eng, real_sock_read, &fd, real_sock_write, &fd);
 
-    // dump_ssl_client(&sc);
-    // dump_x509_minimal(&xc);
-    // print_session_secret(&sc);
-	// printf("sizeof(ioc): %zu\n", sizeof(ioc));
-    // br_sslio_write_all(&ioc, "GET ", 4);
+    dump_ssl_client(&sc);
+    dump_x509_minimal(&xc);
+    print_session_secret(&sc);
+	printf("sizeof(ioc): %zu\n", sizeof(ioc));
+	
+    br_sslio_write_all(&ioc, "GET ", 4);
 	// br_sslio_write_all(&ioc, path, strlen(path));
 	// br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
 	// br_sslio_write_all(&ioc, host, strlen(host));
 	// br_sslio_write_all(&ioc, "\r\n\r\n", 4);
-    // br_sslio_flush(&ioc);
+    br_sslio_flush(&ioc);
 
 	for (;;) {
 		int rlen;

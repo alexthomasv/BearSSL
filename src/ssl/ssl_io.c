@@ -52,15 +52,14 @@ br_sslio_init(br_sslio_context *ctx,
 static int
 run_until(br_sslio_context *ctx, unsigned target)
 {
-	printf("in run_until: %d\n", target);
 	for (;;) {
 		unsigned state;
 
 		state = br_ssl_engine_current_state(ctx->engine);
 		if (state & BR_SSL_CLOSED) {
+			printf("in closed\n");
 			return -1;
 		}
-		printf("after state\n");
 		/*
 		 * If there is some record data to send, do it. This takes
 		 * precedence over everything else.
@@ -70,10 +69,10 @@ run_until(br_sslio_context *ctx, unsigned target)
 			size_t len;
 			int wlen;
 
-			printf("in sendrec\n");
 			buf = br_ssl_engine_sendrec_buf(ctx->engine, &len);
-			printf("after sendrec_buf\n");
-			wlen = ctx->low_write(ctx->write_context, buf, len);
+			wlen = g_write(ctx->low_write, ctx->write_context, buf, len);
+			// wlen = ctx->low_write(ctx->write_context, buf, len);
+			printf("wlen: %d\n", wlen);
 			if (wlen < 0) {
 				/*
 				 * If we received a close_notify and we
@@ -89,6 +88,7 @@ run_until(br_sslio_context *ctx, unsigned target)
 				return -1;
 			}
 			if (wlen > 0) {
+				printf("br_ssl_engine_sendrec_ack\n");
 				br_ssl_engine_sendrec_ack(ctx->engine, wlen);
 			}
 			continue;
@@ -98,6 +98,7 @@ run_until(br_sslio_context *ctx, unsigned target)
 		 * If we reached our target, then we are finished.
 		 */
 		if (state & target) {
+			printf("in run_until: %d\n", target);
 			return 0;
 		}
 
@@ -110,6 +111,7 @@ run_until(br_sslio_context *ctx, unsigned target)
 		 * This is unrecoverable here, so we report an error.
 		 */
 		if (state & BR_SSL_RECVAPP) {
+			printf("in recvapp\n");
 			return -1;
 		}
 
@@ -125,14 +127,16 @@ run_until(br_sslio_context *ctx, unsigned target)
 			printf("in recvrec\n");
 			buf = br_ssl_engine_recvrec_buf(ctx->engine, &len);
 			printf("after recvrec_buf: %s\n", buf);
-			rlen = ctx->low_read(ctx->read_context, buf, len);
-			printf("after low_read\n");
+			rlen = g_read(ctx->low_read, ctx->read_context, buf, len);
+			// rlen = ctx->low_read(ctx->read_context, buf, len);
+			printf("after low_read: %d\n", rlen);
 			if (rlen < 0) {
 				printf("br_sslio_read: %d\n", rlen);
 				br_ssl_engine_fail(ctx->engine, BR_ERR_IO);
 				return -1;
 			}
 			if (rlen > 0) {
+				printf("in recvrec_ack\n");
 				br_ssl_engine_recvrec_ack(ctx->engine, rlen);
 			}
 			continue;

@@ -23,12 +23,14 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /* see bearssl_block.h */
 uint32_t
 br_chacha20_ct_run(const void *key,
 	const void *iv, uint32_t cc, void *data, size_t len)
 {
+	printf("chacha20_ct_run\n");
 	unsigned char *buf;
 	uint32_t kw[8], ivw[3];
 	size_t u;

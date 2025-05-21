@@ -264,7 +264,6 @@ hash_data(br_ssl_server_context *ctx,
 static int
 do_ecdhe_part1(br_ssl_server_context *ctx, int curve)
 {
-	printf("in do_ecdhe_part1\n");
 	unsigned algo_id;
 	unsigned mask;
 	const unsigned char *order;
@@ -285,13 +284,10 @@ do_ecdhe_part1(br_ssl_server_context *ctx, int curve)
 	 * possible values.
 	 */
 	order = ctx->eng.iec->order(curve, &olen);
-	printf("order: %p\n", order);
-	printf("order[0]: %d\n", order[0]);
 	mask = 0xFF;
 	while (mask >= order[0]) {
 		mask >>= 1;
 	}
-	printf("mask: %d\n", mask);
 	br_hmac_drbg_generate(&ctx->eng.rng, ctx->ecdhe_key, olen);
 	ctx->ecdhe_key[0] &= mask;
 	ctx->ecdhe_key[olen - 1] |= 0x01;
@@ -324,10 +320,8 @@ do_ecdhe_part1(br_ssl_server_context *ctx, int curve)
 			return -BR_ERR_INVALID_ALGORITHM;
 		}
 	}
-	printf("hv_len: %d\n", hv_len);
 	sig_len = (*ctx->policy_vtable)->do_sign(ctx->policy_vtable,
 		algo_id, ctx->eng.pad, hv_len, sizeof ctx->eng.pad);
-	printf("sig_len: %d\n", sig_len);
 	return sig_len ? (int)sig_len : -BR_ERR_INVALID_ALGORITHM;
 }
 
@@ -961,7 +955,6 @@ T0_DEFENTRY(br_ssl_hs_server_init_main, 166)
 void
 br_ssl_hs_server_run(void *t0ctx)
 {
-	printf("in br_ssl_hs_server_run\n");
 	uint32_t *dp, *rp;
 	const unsigned char *ip;
 

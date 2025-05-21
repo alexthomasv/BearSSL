@@ -41,7 +41,7 @@ gen_gcm_init(br_sslrec_gcm_context *cc,
 
 	cc->seq = 0;
 	g_br_block_init(bc_impl->init, &cc->bc.vtable, key, key_len);
-	bc_impl->init(&cc->bc.vtable, key, key_len);
+	// bc_impl->init(&cc->bc.vtable, key, key_len);
 	cc->gh = gh_impl;
 	memcpy(cc->iv, iv, sizeof cc->iv);
 	memset(cc->h, 0, sizeof cc->h);
@@ -184,7 +184,7 @@ out_gcm_init(br_sslrec_gcm_context *cc,
 	gen_gcm_init(cc, bc_impl, key, key_len, gh_impl, iv);
 }
 
-static void
+void
 gcm_max_plaintext(const br_sslrec_gcm_context *cc,
 	size_t *start, size_t *end)
 {
