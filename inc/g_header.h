@@ -339,6 +339,31 @@ ec_prime_i31_api_order(int curve, size_t *len);
 extern size_t
 ec_prime_i31_api_xoff(int curve, size_t *len);
 
+extern const unsigned char *
+ec_p_256_m31_api_generator(int curve, size_t *len);
+
+extern const unsigned char *
+ec_all_m31_api_order(int curve, size_t *len);
+
+extern const unsigned char *
+ec_all_m31_api_generator(int curve, size_t *len);
+
+uint32_t
+ec_all_m31_api_mul(unsigned char *G, size_t Glen,
+	const unsigned char *kb, size_t kblen, int curve);
+
+uint32_t
+ec_all_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+	
+size_t
+ec_all_m31_api_mulgen(unsigned char *R,
+	const unsigned char *x, size_t xlen, int curve);
+
+extern size_t
+ec_all_m31_api_xoff(int curve, size_t *len);
+
 extern int
 sock_read(void *ctx, unsigned char *buf, size_t len);
 
@@ -350,6 +375,9 @@ extern void xm_start_chain(const br_x509_class **ctx, const char *server_name);
 extern void xm_start_cert(const br_x509_class **ctx, uint32_t length);
 
 extern void xm_append(const br_x509_class **ctx, const unsigned char *buf, size_t len);
+
+extern const br_x509_pkey *
+xm_get_pkey(const br_x509_class *const *ctx, unsigned *usages);
 
 extern void xm_end_cert(const br_x509_class **ctx);
 

@@ -26,8 +26,8 @@
 #include "g_header.h"
 #include <stdio.h>
 
-static const unsigned char *
-api_generator(int curve, size_t *len)
+const unsigned char *
+ec_all_m31_api_generator(int curve, size_t *len)
 {
 	switch (curve) {
 	case BR_EC_secp256r1:
@@ -50,8 +50,8 @@ api_generator(int curve, size_t *len)
 	}
 }
 
-static const unsigned char *
-api_order(int curve, size_t *len)
+const unsigned char *
+ec_all_m31_api_order(int curve, size_t *len)
 {
 	printf("in api_order: %d\n", curve);
 	switch (curve) {
@@ -76,8 +76,8 @@ api_order(int curve, size_t *len)
 	}
 }
 
-static size_t
-api_xoff(int curve, size_t *len)
+size_t
+ec_all_m31_api_xoff(int curve, size_t *len)
 {
 	switch (curve) {
 	case BR_EC_secp256r1:
@@ -100,8 +100,8 @@ api_xoff(int curve, size_t *len)
 	}
 }
 
-static uint32_t
-api_mul(unsigned char *G, size_t Glen,
+uint32_t
+ec_all_m31_api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve)
 {
 	switch (curve) {
@@ -125,8 +125,8 @@ api_mul(unsigned char *G, size_t Glen,
 	}
 }
 
-static size_t
-api_mulgen(unsigned char *R,
+size_t
+ec_all_m31_api_mulgen(unsigned char *R,
 	const unsigned char *x, size_t xlen, int curve)
 {
 	switch (curve) {
@@ -150,8 +150,8 @@ api_mulgen(unsigned char *R,
 	}
 }
 
-static uint32_t
-api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+uint32_t
+ec_all_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve)
 {
@@ -187,10 +187,10 @@ api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 /* see bearssl_ec.h */
 const br_ec_impl br_ec_all_m31 = {
 	(uint32_t)0x23800000,
-	&api_generator,
-	&api_order,
-	&api_xoff,
-	&api_mul,
-	&api_mulgen,
-	&api_muladd
+	&ec_all_m31_api_generator,
+	&ec_all_m31_api_order,
+	&ec_all_m31_api_xoff,
+	&ec_all_m31_api_mul,
+	&ec_all_m31_api_mulgen,
+	&ec_all_m31_api_muladd
 };

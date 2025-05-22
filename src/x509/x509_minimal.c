@@ -287,6 +287,7 @@ xm_start_cert(const br_x509_class **ctx, uint32_t length)
 		return;
 	}
 	if (length == 0) {
+		printf("length: %u\n", length);
 		cc->err = BR_ERR_X509_TRUNCATED;
 		return;
 	}
@@ -314,6 +315,7 @@ xm_end_cert(const br_x509_class **ctx)
 
 	cc = (br_x509_minimal_context *)(void *)ctx;
 	if (cc->err == 0 && cc->cert_length != 0) {
+		printf("[xm_end_cert] cc->err: %d\n", cc->err);
 		cc->err = BR_ERR_X509_TRUNCATED;
 	}
 	cc->num_certs ++;

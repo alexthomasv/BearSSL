@@ -1451,7 +1451,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	xc = *(ENG->x509ctx);
 	// pk = xc->get_pkey(ENG->x509ctx, &usages);
-	pk = g_get_pkey(xc->get_pkey, xc, &usages);
+	pk = g_get_pkey(xc->get_pkey, ENG->x509ctx, &usages);
 	if (pk == NULL) {
 		T0_PUSH(0);
 	} else {
@@ -1613,7 +1613,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	xc = *(ENG->x509ctx);
 	// pk = xc->get_pkey(ENG->x509ctx, NULL);
-	pk = g_get_pkey(xc->get_pkey, xc, NULL);
+	pk = g_get_pkey(xc->get_pkey, ENG->x509ctx, NULL);
 	CTX->server_curve =
 		(pk->key_type == BR_KEYTYPE_EC) ? pk->key.ec.curve : 0;
 
@@ -1921,7 +1921,7 @@ br_ssl_hs_client_run(void *t0ctx)
 	len = T0_POP();
 	printf("x509-append: len: %zu\n", len);
 	// xc->append(ENG->x509ctx, ENG->pad, len);
-	g_append(xc->append, xc, ENG->pad, len);
+	g_append(xc->append, ENG->x509ctx, ENG->pad, len);
 				}
 				break;
 			case 84: {

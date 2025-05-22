@@ -190,7 +190,7 @@ chapol_encrypt(br_sslrec_chapol_context *cc,
 	br_enc16be(buf + 1, version);
 	br_enc16be(buf + 3, len + 16);
 	*data_len = len + 21;
-	dump_chunk(data, *data_len);
+	dump_chunk(buf, *data_len);
 	return buf;
 }
 

@@ -318,7 +318,7 @@ make_ready_out(br_ssl_engine_context *rc)
 	a = 5;
 	b = rc->obuf_len - a;
 	printf("generic_max_plaintext\n");
-	generic_max_plaintext((void *) rc->out.vtable->max_plaintext, &rc->out.vtable, &a, &b);
+	generic_max_plaintext(rc->out.vtable->max_plaintext, &rc->out.vtable, &a, &b);
 	// rc->out.vtable->max_plaintext(&rc->out.vtable, &a, &b);
 	if ((b - a) > rc->max_frag_len) {
 		b = a + rc->max_frag_len;
