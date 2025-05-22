@@ -254,15 +254,20 @@ void generic_max_plaintext(void *fn_pointer, const br_sslrec_out_class *const *c
 {
 	if (fn_pointer == &clear_max_plaintext) {
 		clear_max_plaintext(ctx, start, end);
-	} else if (fn_pointer == &cbc_max_plaintext) {
-		cbc_max_plaintext(ctx, start, end);
-	} else if (fn_pointer == &gcm_max_plaintext) {
-		gcm_max_plaintext(ctx, start, end);
-	} else if (fn_pointer == &ccm_max_plaintext) {
-		ccm_max_plaintext(ctx, start, end);
-	} else if (fn_pointer == &chapol_max_plaintext) {
+	} 
+	else if (fn_pointer == &chapol_max_plaintext) {
 		chapol_max_plaintext(ctx, start, end);
-	} else {
+	} 
+	// else if (fn_pointer == &gcm_max_plaintext) {
+	// 	gcm_max_plaintext(ctx, start, end);
+	// } 
+	// else if (fn_pointer == &ccm_max_plaintext) {
+	// 	ccm_max_plaintext(ctx, start, end);
+	// } 
+	// else if (fn_pointer == &cbc_max_plaintext) {
+	// 	cbc_max_plaintext(ctx, start, end);
+	// } 
+	else {
 		printf("generic_max_plaintext: %p\n", fn_pointer);
 		abort();
 	}
@@ -313,18 +318,23 @@ unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx
 	if (fn_pointer == &clear_encrypt) {
 		printf("clear_encrypt: %p\n", fn_pointer);
 		return clear_encrypt(ctx, record_type, version, plaintext, len);
-	// } else if (fn_pointer == &cbc_encrypt) {
-	// 	return cbc_encrypt(ctx, record_type, version, plaintext, len);
-	} else if (fn_pointer == &gcm_encrypt) {
-		printf("gcm_encrypt: %p\n", fn_pointer);
-		return gcm_encrypt(ctx, record_type, version, plaintext, len);
-	} else if (fn_pointer == &ccm_encrypt) {
-		printf("ccm_encrypt: %p\n", fn_pointer);
-		return ccm_encrypt(ctx, record_type, version, plaintext, len);
-	} else if (fn_pointer == &chapol_encrypt) {
-		printf("chapol_encrypt: %p\n", fn_pointer);
+	} 
+	else if (fn_pointer == &chapol_encrypt) {
 		return chapol_encrypt(ctx, record_type, version, plaintext, len);
-	} else {
+	} 
+	// else if (fn_pointer == &gcm_encrypt) {
+	// 	printf("gcm_encrypt: %p\n", fn_pointer);
+	// 	return gcm_encrypt(ctx, record_type, version, plaintext, len);
+	// } 
+	// else if (fn_pointer == &ccm_encrypt) {
+	// 	printf("ccm_encrypt: %p\n", fn_pointer);
+	// 	return ccm_encrypt(ctx, record_type, version, plaintext, len);
+	// } 
+	// else if (fn_pointer == &cbc_encrypt) {
+	// 	printf("chapol_encrypt: %p\n", fn_pointer);
+	// 	return cbc_encrypt(ctx, record_type, version, plaintext, len);
+	// } 
+	else {
 		printf("generic_encrypt: %p, %p, %p\n", fn_pointer, clear_encrypt, &clear_encrypt);
 		abort();
 	}
@@ -333,15 +343,19 @@ unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx
 unsigned char *generic_decrypt(void *fn_pointer, const br_sslrec_in_class **ctx,
 		int record_type, unsigned version,
 		void *ciphertext, size_t *len){
-	if (fn_pointer == &cbc_decrypt) {
-		return cbc_decrypt(ctx, record_type, version, ciphertext, len);
-	} else if (fn_pointer == &gcm_decrypt) {
-		return gcm_decrypt(ctx, record_type, version, ciphertext, len);
-	} else if (fn_pointer == &ccm_decrypt) {
-		return ccm_decrypt(ctx, record_type, version, ciphertext, len);
-	} else if (fn_pointer == &chapol_decrypt) {
+	if (fn_pointer == &chapol_decrypt) {
 		return chapol_decrypt(ctx, record_type, version, ciphertext, len);
-	} else {
+	} 
+	// else if (fn_pointer == &gcm_decrypt) {
+	// 	return gcm_decrypt(ctx, record_type, version, ciphertext, len);
+	// } 
+	// else if (fn_pointer == &ccm_decrypt) {
+	// 	return ccm_decrypt(ctx, record_type, version, ciphertext, len);
+	// } 
+	// else if (fn_pointer == &cbc_decrypt) {
+	// 	return cbc_decrypt(ctx, record_type, version, ciphertext, len);
+	// } 
+	else {
 		abort();
 	}
 }
@@ -428,17 +442,23 @@ void g_br_block_mac(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 void generic_hash_init(void *fn_pointer, const br_hash_class **ctx){
 	if (fn_pointer == &br_sha256_init) {
 		br_sha256_init(ctx);
-	} else if (fn_pointer == &br_sha384_init) {
+	} 
+	else if (fn_pointer == &br_sha384_init) {
 		br_sha384_init(ctx);
-	} else if (fn_pointer == &br_sha1_init) {
+	} 
+	else if (fn_pointer == &br_sha1_init) {
 		br_sha1_init(ctx);
-	} else if (fn_pointer == &br_md5_init) {
+	} 
+	else if (fn_pointer == &br_md5_init) {
 		br_md5_init(ctx);
-	} else if (fn_pointer == &br_sha224_init) {
+	} 
+	else if (fn_pointer == &br_sha224_init) {
 		br_sha224_init(ctx);
-	} else if (fn_pointer == &br_sha512_init) {
+	} 
+	else if (fn_pointer == &br_sha512_init) {
 		br_sha512_init(ctx);
-	} else {
+	} 
+	else {
 		printf("generic_hash_init: %p\n", fn_pointer);
 		abort();
 	}
@@ -447,17 +467,23 @@ void generic_hash_init(void *fn_pointer, const br_hash_class **ctx){
 void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, const void *data, size_t len){
 	if (fn_pointer == &br_sha256_update) {
 		br_sha256_update(ctx, data, len);
-	} else if (fn_pointer == &br_sha384_update) {
+	} 
+	else if (fn_pointer == &br_sha384_update) {
 		br_sha384_update(ctx, data, len);
-	} else if (fn_pointer == &br_sha1_update) {
+	} 
+	else if (fn_pointer == &br_sha1_update) {
 		br_sha1_update(ctx, data, len);
-	} else if (fn_pointer == &br_md5_update) {
+	} 
+	else if (fn_pointer == &br_md5_update) {
 		br_md5_update(ctx, data, len);
-	} else if (fn_pointer == &br_sha224_update) {
+	} 
+	else if (fn_pointer == &br_sha224_update) {
 		br_sha224_update(ctx, data, len);
-	} else if (fn_pointer == &br_sha512_update) {
-		br_sha512_update(ctx, data, len);
-	} else {
+	} 
+	// else if (fn_pointer == &br_sha512_update) {
+	// 	br_sha512_update(ctx, data, len);
+	// } 
+	else {
 		printf("generic_hash_update: %p\n", fn_pointer);
 		abort();
 	}
@@ -466,17 +492,23 @@ void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, cons
 void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst){
 	if (fn_pointer == &br_sha256_out) {
 		br_sha256_out(ctx, dst);
-	} else if (fn_pointer == &br_sha384_out) {
+	} 
+	else if (fn_pointer == &br_sha384_out) {
 		br_sha384_out(ctx, dst);
-	} else if (fn_pointer == &br_sha1_out) {
+	} 
+	else if (fn_pointer == &br_sha1_out) {
 		br_sha1_out(ctx, dst);
-	} else if (fn_pointer == &br_md5_out) {
+	} 
+	else if (fn_pointer == &br_md5_out) {
 		br_md5_out(ctx, dst);
-	} else if (fn_pointer == &br_sha224_out) {
+	} 
+	else if (fn_pointer == &br_sha224_out) {
 		br_sha224_out(ctx, dst);
-	} else if (fn_pointer == &br_sha512_out) {
-		br_sha512_out(ctx, dst);
-	} else {
+	} 
+	// else if (fn_pointer == &br_sha512_out) {
+	// 	br_sha512_out(ctx, dst);
+	// } 
+	else {
 		printf("generic_hash_out: %p\n", fn_pointer);
 		abort();
 	}
@@ -485,17 +517,23 @@ void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *d
 uint64_t generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, void *out){
 	if (fn_pointer == &br_sha256_state) {
 		return br_sha256_state(ctx, out);
-	} else if (fn_pointer == &br_sha384_state) {
+	} 
+	else if (fn_pointer == &br_sha384_state) {
 		return br_sha384_state(ctx, out);
-	} else if (fn_pointer == &br_sha1_state) {
+	} 
+	else if (fn_pointer == &br_sha1_state) {
 		return br_sha1_state(ctx, out);
-	} else if (fn_pointer == &br_md5_state) {
+	} 
+	else if (fn_pointer == &br_md5_state) {
 		return br_md5_state(ctx, out);
-	} else if (fn_pointer == &br_sha224_state) {
+	} 
+	else if (fn_pointer == &br_sha224_state) {
 		return br_sha224_state(ctx, out);
-	} else if (fn_pointer == &br_sha512_state) {
-		return br_sha512_state(ctx, out);
-	} else {
+	} 
+	// else if (fn_pointer == &br_sha512_state) {
+	// 	return br_sha512_state(ctx, out);
+	// } 
+	else {
 		printf("generic_hash_state: %p\n", fn_pointer);
 		abort();
 	}
@@ -504,32 +542,42 @@ uint64_t generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, v
 void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, void *stb, uint64_t count){
 	if (fn_pointer == &br_sha256_set_state) {
 		br_sha256_set_state(ctx, stb, count);
-	} else if (fn_pointer == &br_sha384_set_state) {
+	} 
+	else if (fn_pointer == &br_sha384_set_state) {
 		br_sha384_set_state(ctx, stb, count);
-	} else if (fn_pointer == &br_sha1_set_state) {
+	} 
+	else if (fn_pointer == &br_sha1_set_state) {
 		br_sha1_set_state(ctx, stb, count);
-	} else if (fn_pointer == &br_md5_set_state) {
+	} 
+	else if (fn_pointer == &br_md5_set_state) {
 		br_md5_set_state(ctx, stb, count);
-	} else if (fn_pointer == &br_sha224_set_state) {
+	} 
+	else if (fn_pointer == &br_sha224_set_state) {
 		br_sha224_set_state(ctx, stb, count);
-	} else if (fn_pointer == &br_sha512_set_state) {
-		br_sha512_set_state(ctx, stb, count);
-	} else {
+	} 
+	// else if (fn_pointer == &br_sha512_set_state) {
+	// 	br_sha512_set_state(ctx, stb, count);
+	// } 
+	else {
 		printf("generic_set_state: %p\n", fn_pointer);
 		abort();
 	}
 }
 
 int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_t len){
-	 if (fn_pointer == &cbc_check_length) {
-		return cbc_check_length(ctx, len);
-	} else if (fn_pointer == &gcm_check_length) {
-		return gcm_check_length(ctx, len);
-	} else if (fn_pointer == &ccm_check_length) {
-		return ccm_check_length(ctx, len);
-	} else if (fn_pointer == &chapol_check_length) {
+	if (fn_pointer == &chapol_check_length) {
 		return chapol_check_length(ctx, len);
-	} else {
+	} 
+	// else if (fn_pointer == &gcm_check_length) {
+	// 	return gcm_check_length(ctx, len);
+	// } 
+	// else if (fn_pointer == &ccm_check_length) {
+	// 	return ccm_check_length(ctx, len);
+	// } 
+	// else if (fn_pointer == &cbc_check_length) {
+	// 	return cbc_check_length(ctx, len);
+	// } 
+	else {
 		printf("generic_check_length: %p\n", fn_pointer);
 		abort();
 	}
@@ -538,18 +586,23 @@ int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_
 uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve){
-	if (fn_pointer == &ec_c_25519_i15_api_muladd) {
-		return ec_c_25519_i15_api_muladd(A, B, len, x, xlen, y, ylen, curve);
-	} else if (fn_pointer == &ec_c_25519_i31_api_muladd) {
-		return ec_c_25519_i31_api_muladd(A, B, len, x, xlen, y, ylen, curve);
-	} else if (fn_pointer == &ec_c_25519_m15_api_muladd) {
-		return ec_c_25519_m15_api_muladd(A, B, len, x, xlen, y, ylen, curve);
-	} else if (fn_pointer == &ec_c_25519_m31_api_muladd) {
-		return ec_c_25519_m31_api_muladd(A, B, len, x, xlen, y, ylen, curve);
-	} else {
-		printf("generic_muladd: %p\n", fn_pointer);
-		abort();
-	}
+	abort();
+	// if (fn_pointer == &ec_c_25519_i15_api_muladd) {
+	// 	return ec_c_25519_i15_api_muladd(A, B, len, x, xlen, y, ylen, curve);
+	// } 
+	// else if (fn_pointer == &ec_c_25519_i31_api_muladd) {
+	// 	return ec_c_25519_i31_api_muladd(A, B, len, x, xlen, y, ylen, curve);
+	// } 
+	// else if (fn_pointer == &ec_c_25519_m15_api_muladd) {
+	// 	return ec_c_25519_m15_api_muladd(A, B, len, x, xlen, y, ylen, curve);
+	// } 
+	// else if (fn_pointer == &ec_c_25519_m31_api_muladd) {
+	// 	return ec_c_25519_m31_api_muladd(A, B, len, x, xlen, y, ylen, curve);
+	// } 
+	// else {
+	// 	printf("generic_muladd: %p\n", fn_pointer);
+	// 	abort();
+	// }
 }
 
 void g_generator(void *fn_pointer, int curve, size_t *len){
@@ -638,13 +691,15 @@ void br_hash_dn_set_state(void *fn_pointer, const br_hash_class *const *ctx, voi
 void generic_hs_run(void *fn_pointer, void *cc){
 	if (fn_pointer == &br_ssl_hs_client_run) {
 		br_ssl_hs_client_run(cc);
-	} else {
-		printf("generic_hs_run: %p, %p, %p\n", fn_pointer, br_ssl_hs_server_run, &br_ssl_hs_server_run);
-		abort();
-	}
+	} 
 	// else if (fn_pointer == &br_ssl_hs_server_run) {
 	// 	br_ssl_hs_server_run(cc);
 	// } 
+	else {
+		printf("generic_hs_run: %p, %p, %p\n", fn_pointer, br_ssl_hs_server_run, &br_ssl_hs_server_run);
+		abort();
+	}
+
 
 }
 
