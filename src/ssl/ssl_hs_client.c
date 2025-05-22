@@ -10,33 +10,6 @@ typedef struct {
 	const unsigned char *ip;
 } t0_context;
 
-static void
-dump_chunk(const void *p, size_t len)
-{
-    const unsigned char *v = p;
-    for (size_t i = 0; i < len; i += 16) {
-        /* print offset */
-        printf("  %04zx  ", i);
-
-        /* hex part */
-        for (size_t j = 0; j < 16; j++) {
-            if (i + j < len)
-                printf("%02x ", v[i + j]);
-            else
-                printf("   ");
-        }
-
-        /* ASCII part */
-        printf(" ");
-        for (size_t j = 0; j < 16 && i + j < len; j++) {
-            unsigned char c = v[i + j];
-            putchar((c >= 32 && c <= 126) ? c : '.');
-        }
-        putchar('\n');
-    }
-}
-
-
 static uint32_t
 t0_parse7E_unsigned(const unsigned char **p)
 {
@@ -131,7 +104,6 @@ void br_ssl_hs_client_run(void *t0ctx);
 static int
 make_pms_rsa(br_ssl_client_context *ctx, int prf_id)
 {
-	printf("make_pms_rsa\n");
 	const br_x509_class **xc;
 	const br_x509_pkey *pk;
 	const unsigned char *n;
@@ -298,7 +270,6 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 static int
 make_pms_ecdh(br_ssl_client_context *ctx, unsigned ecdhe, int prf_id)
 {
-	printf("make_pms_ecdh\n");
 	int curve;
 	unsigned char key[66], point[133];
 	const unsigned char *order, *point_src;
@@ -1577,7 +1548,6 @@ br_ssl_hs_client_run(void *t0ctx)
 		}
 		memcpy((unsigned char *)ENG + addr, ENG->hbuf_in, clen);
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
-			printf("update-multihash: clen: %zu\n", clen);
 			br_multihash_update(&ENG->mhash, ENG->hbuf_in, clen);
 		}
 		T0_PUSH(addr + (uint32_t)clen);
@@ -1596,7 +1566,6 @@ br_ssl_hs_client_run(void *t0ctx)
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
 			br_multihash_update(&ENG->mhash, &x, 1);
 		}
-		printf("read8-native: %02x, %zu\n", x, ENG->hlen_in);
 		T0_PUSH(x);
 		ENG->hlen_in --;
 	} else {
@@ -1648,7 +1617,6 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	void *str = (unsigned char *)ENG + (size_t)T0_POP();
 	T0_PUSH((uint32_t)strlen(str));
-	printf("strlen: %zu\n", strlen(str));
 
 				}
 				break;
@@ -1699,7 +1667,6 @@ br_ssl_hs_client_run(void *t0ctx)
 				break;
 			case 69: {
 				/* switch-aesccm-in */
-	printf("switch-aesccm-in\n");
 	int is_client, prf_id;
 	unsigned cipher_key_len, tag_len;
 
@@ -1714,7 +1681,6 @@ br_ssl_hs_client_run(void *t0ctx)
 				break;
 			case 70: {
 				/* switch-aesccm-out */
-	printf("switch-aesccm-out\n");
 	int is_client, prf_id;
 	unsigned cipher_key_len, tag_len;
 
@@ -1736,7 +1702,6 @@ br_ssl_hs_client_run(void *t0ctx)
 	cipher_key_len = T0_POP();
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-aesgcm-in\n");
 	br_ssl_engine_switch_gcm_in(ENG, is_client, prf_id,
 		ENG->iaes_ctr, cipher_key_len);
 
@@ -1751,7 +1716,6 @@ br_ssl_hs_client_run(void *t0ctx)
 	cipher_key_len = T0_POP();
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-aesgcm-out\n");
 	br_ssl_engine_switch_gcm_out(ENG, is_client, prf_id,
 		ENG->iaes_ctr, cipher_key_len);
 
@@ -1768,7 +1732,6 @@ br_ssl_hs_client_run(void *t0ctx)
 	mac_id = T0_POP();
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-cbc-in\n");
 	br_ssl_engine_switch_cbc_in(ENG, is_client, prf_id, mac_id,
 		aes ? ENG->iaes_cbcdec : ENG->ides_cbcdec, cipher_key_len);
 
@@ -1785,7 +1748,6 @@ br_ssl_hs_client_run(void *t0ctx)
 	mac_id = T0_POP();
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-cbc-out\n");
 	br_ssl_engine_switch_cbc_out(ENG, is_client, prf_id, mac_id,
 		aes ? ENG->iaes_cbcenc : ENG->ides_cbcenc, cipher_key_len);
 
@@ -1798,7 +1760,6 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-chapol-in\n");
 	br_ssl_engine_switch_chapol_in(ENG, is_client, prf_id);
 
 				}
@@ -1810,7 +1771,6 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	prf_id = T0_POP();
 	is_client = T0_POP();
-	printf("switch-chapol-out\n");
 	br_ssl_engine_switch_chapol_out(ENG, is_client, prf_id);
 
 				}
@@ -1919,7 +1879,6 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	xc = *(ENG->x509ctx);
 	len = T0_POP();
-	printf("x509-append: len: %zu\n", len);
 	// xc->append(ENG->x509ctx, ENG->pad, len);
 	g_append(xc->append, ENG->x509ctx, ENG->pad, len);
 				}
@@ -1927,7 +1886,6 @@ br_ssl_hs_client_run(void *t0ctx)
 			case 84: {
 				/* x509-end-cert */
 
-	printf("x509-end-cert\n");
 	const br_x509_class *xc;
 
 	xc = *(ENG->x509ctx);
@@ -1938,20 +1896,17 @@ br_ssl_hs_client_run(void *t0ctx)
 				break;
 			case 85: {
 				/* x509-end-chain */
-	printf("x509-end-chain\n");
 	const br_x509_class *xc;
 
 	xc = *(ENG->x509ctx);
 	// T0_PUSH(xc->end_chain(ENG->x509ctx));
 	T0_PUSH(g_end_chain(xc->end_chain, ENG->x509ctx));
-	printf("x509-end-chain: %d\n", T0_PEEK(0));
 
 				}
 				break;
 			case 86: {
 				/* x509-start-cert */
 
-	printf("x509-start-cert: %d\n", T0_PEEK(0));
 	const br_x509_class *xc;
 
 	xc = *(ENG->x509ctx);
@@ -1967,7 +1922,6 @@ br_ssl_hs_client_run(void *t0ctx)
 	
 	const br_x509_class *xc;
 	uint32_t bc;
-	printf("x509-start-chain bc: %d\n", T0_PEEK(0));
 
 	bc = T0_POP();
 	xc = *(ENG->x509ctx);
@@ -1983,7 +1937,6 @@ br_ssl_hs_client_run(void *t0ctx)
 		}
 	}
 t0_exit:
-	printf("\n");
 	((t0_context *)t0ctx)->dp = dp;
 	((t0_context *)t0ctx)->rp = rp;
 	((t0_context *)t0ctx)->ip = ip;

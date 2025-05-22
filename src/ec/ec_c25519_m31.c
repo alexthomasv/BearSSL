@@ -581,7 +581,6 @@ static const unsigned char ORDER[] = {
 const unsigned char *
 ec_c_25519_m31_api_generator(int curve, size_t *len)
 {
-	printf("in ec_c_25519_m31_api_generator\n");
 	(void)curve;
 	*len = 32;
 	return GEN;

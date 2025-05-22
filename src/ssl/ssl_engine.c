@@ -317,7 +317,6 @@ make_ready_out(br_ssl_engine_context *rc)
 
 	a = 5;
 	b = rc->obuf_len - a;
-	printf("generic_max_plaintext\n");
 	generic_max_plaintext(rc->out.vtable->max_plaintext, &rc->out.vtable, &a, &b);
 	// rc->out.vtable->max_plaintext(&rc->out.vtable, &a, &b);
 	if ((b - a) > rc->max_frag_len) {
@@ -492,7 +491,6 @@ rng_init(br_ssl_engine_context *cc)
 	 * irrelevant here, but they still make people nervous).
 	 */
 	h = br_multihash_getimpl(&cc->mhash, br_sha256_ID);
-	printf("after br_multihash_getimpl: %p\n", h);
 	if (!h) {
 		h = br_multihash_getimpl(&cc->mhash, br_sha384_ID);
 		if (!h) {
@@ -513,11 +511,9 @@ rng_init(br_ssl_engine_context *cc)
 int
 br_ssl_engine_init_rand(br_ssl_engine_context *cc)
 {
-	printf("in init rand\n");
 	if (!rng_init(cc)) {
 		return 0;
 	}
-	printf("after rng init\n");
 
 	/*
 	 * We always try OS/hardware seeding once. If it works, then
@@ -533,12 +529,10 @@ br_ssl_engine_init_rand(br_ssl_engine_context *cc)
 		}
 		cc->rng_os_rand_done = 1;
 	}
-	printf("after rng os rand done\n");
 	if (cc->rng_init_done < 2) {
 		br_ssl_engine_fail(cc, BR_ERR_NO_RANDOM);
 		return 0;
 	}
-	printf("after rng init done\n");
 	return 1;
 }
 
@@ -593,9 +587,7 @@ recvrec_buf(const br_ssl_engine_context *rc, size_t *len)
 	switch (rc->iomode) {
 	case BR_IO_IN:
 	case BR_IO_INOUT:
-		printf("in recvrec_buf: %d\n", rc->iomode);
 		if (rc->ixa == rc->ixb) {
-			printf("before z\n");
 			size_t z;
 
 			z = rc->ixc;
@@ -603,7 +595,6 @@ recvrec_buf(const br_ssl_engine_context *rc, size_t *len)
 				z = rc->ibuf_len - rc->ixa;
 			}
 			*len = z;
-			printf("after z: %d\n", z);
 			return rc->ibuf + rc->ixa;
 		}
 		break;
@@ -759,7 +750,6 @@ recvrec_ack(br_ssl_engine_context *rc, size_t len)
 	// pbuf = rc->in.vtable->decrypt(&rc->in.vtable,
 	// 	rc->record_type_in, rc->version_in, rc->ibuf + 5, &pbuf_len);
 	if (pbuf == 0) {
-		printf("pbuf == 0\n");
 		br_ssl_engine_fail(rc, BR_ERR_BAD_MAC);
 		return;
 	}
@@ -935,7 +925,6 @@ sendrec_ack(br_ssl_engine_context *rc, size_t len)
 static inline int
 has_rec_tosend(const br_ssl_engine_context *rc)
 {
-	printf("has_rec_tosend\n");
 	return rc->oxa == rc->oxb && rc->oxa != rc->oxc;
 }
 
@@ -1098,12 +1087,9 @@ jump_handshake(br_ssl_engine_context *cc, int action)
 		cc->hlen_in = hlen_in;
 		cc->hlen_out = hlen_out;
 		cc->action = action;
-		printf("before generic hs run %p, %p\n", cc->hsrun, &cc->cpu);
 		generic_hs_run(cc->hsrun, &cc->cpu);
 		// cc->hsrun(&cc->cpu);
-		printf("after generic hs run\n");
 		if (br_ssl_engine_closed(cc)) {
-			printf("in jump_handshake, closed\n");
 			return;
 		}
 		if (cc->hbuf_out != cc->saved_hbuf_out) {
@@ -1211,10 +1197,8 @@ br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len)
 {
 	unsigned char *buf;
 
-	printf("[br_ssl_engine_recvrec_ack] in recvrec_ack\n");
 	recvrec_ack(cc, len);
 	if (br_ssl_engine_closed(cc)) {
-		printf("[br_ssl_engine_recvrec_ack] in recvrec_ack, closed\n");
 		return;
 	}
 
@@ -1225,7 +1209,6 @@ br_ssl_engine_recvrec_ack(br_ssl_engine_context *cc, size_t len)
 	 */
 	buf = recvpld_buf(cc, &len);
 	if (buf != NULL) {
-		printf("[cc->record_type_in: %d]\n", cc->record_type_in);
 		switch (cc->record_type_in) {
 		case BR_SSL_CHANGE_CIPHER_SPEC:
 		case BR_SSL_ALERT:
@@ -1303,7 +1286,6 @@ br_ssl_engine_current_state(const br_ssl_engine_context *cc)
 	size_t len;
 
 	if (br_ssl_engine_closed(cc)) {
-		printf("[br_ssl_engine_current_state] in closed\n");
 		return BR_SSL_CLOSED;
 	}
 
@@ -1345,9 +1327,7 @@ br_ssl_engine_hs_reset(br_ssl_engine_context *cc,
 	cc->shutdown_recv = 0;
 	cc->application_data = 0;
 	cc->alert = 0;
-	printf("before jump handshake: %p, %p\n", hsrun, hsinit);
 	jump_handshake(cc, 0);
-	printf("after jump handshake\n");
 }
 
 /* see inner.h */

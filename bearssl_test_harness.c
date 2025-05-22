@@ -110,18 +110,14 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 int
 sock_write(void *ctx, const unsigned char *buf, size_t len)
 {
-	printf("real_sock_write: fd: %d\n", *(int *)ctx);
-	printf("real_sock_write: len: %zu\n", len);
 	for (;;) {
 		ssize_t wlen;
 
 		wlen = write(*(int *)ctx, buf, len);
-		printf("real_sock_write: wlen: %d\n", wlen);
 		if (wlen <= 0) {
 			if (wlen < 0 && errno == EINTR) {
 				continue;
 			}
-			printf("real_sock_write: error: %d\n", errno);
 			return -1;
 		}
 		return (int)wlen;
@@ -352,10 +348,10 @@ void main() {
 	printf("sizeof(ioc): %zu\n", sizeof(ioc));
 	
     br_sslio_write_all(&ioc, "GET ", 4);
-	// br_sslio_write_all(&ioc, path, strlen(path));
-	// br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
-	// br_sslio_write_all(&ioc, host, strlen(host));
-	// br_sslio_write_all(&ioc, "\r\n\r\n", 4);
+	br_sslio_write_all(&ioc, path, strlen(path));
+	br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
+	br_sslio_write_all(&ioc, host, strlen(host));
+	br_sslio_write_all(&ioc, "\r\n\r\n", 4);
     br_sslio_flush(&ioc);
 
 	for (;;) {

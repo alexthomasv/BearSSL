@@ -130,6 +130,8 @@ br_hmac_out(const br_hmac_context *ctx, void *out)
 	// dig->set_state(&hc.vtable, ctx->kso, (uint64_t)blen);
 	hlen = br_digest_size(dig);
 	generic_hash_update(dig->update, &hc.vtable, tmp, hlen);
+	generic_hash_out(dig->out, &hc.vtable, tmp);
+
 	// dig->update(&hc.vtable, tmp, hlen);
 	// dig->out(&hc.vtable, tmp);
 	memcpy(out, tmp, ctx->out_len);

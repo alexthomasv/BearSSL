@@ -251,7 +251,6 @@ br_x509_minimal_init(br_x509_minimal_context *ctx,
 void
 xm_start_chain(const br_x509_class **ctx, const char *server_name)
 {
-	printf("[xm_start_chain]\n");
 	br_x509_minimal_context *cc;
 	size_t u;
 
@@ -260,21 +259,17 @@ xm_start_chain(const br_x509_class **ctx, const char *server_name)
 		cc->name_elts[u].status = 0;
 		cc->name_elts[u].buf[0] = 0;
 	}
-	printf("cc->num_name_elts: %zu\n", cc->num_name_elts);
 	memset(&cc->pkey, 0, sizeof cc->pkey);
-	printf("cc->pkey: %p\n", &cc->pkey);
 	cc->num_certs = 0;
 	cc->err = 0;
 	cc->cpu.dp = cc->dp_stack;
 	cc->cpu.rp = cc->rp_stack;
 	br_x509_minimal_init_main(&cc->cpu);
-	printf("cc->cpu.dp: %p\n", cc->cpu.dp);
 	if (server_name == NULL || *server_name == 0) {
 		cc->server_name = NULL;
 	} else {
 		cc->server_name = server_name;
 	}
-	printf("[xm_start_chain] end\n");
 }
 
 void
@@ -287,7 +282,6 @@ xm_start_cert(const br_x509_class **ctx, uint32_t length)
 		return;
 	}
 	if (length == 0) {
-		printf("length: %u\n", length);
 		cc->err = BR_ERR_X509_TRUNCATED;
 		return;
 	}
@@ -315,7 +309,6 @@ xm_end_cert(const br_x509_class **ctx)
 
 	cc = (br_x509_minimal_context *)(void *)ctx;
 	if (cc->err == 0 && cc->cert_length != 0) {
-		printf("[xm_end_cert] cc->err: %d\n", cc->err);
 		cc->err = BR_ERR_X509_TRUNCATED;
 	}
 	cc->num_certs ++;
@@ -324,7 +317,6 @@ xm_end_cert(const br_x509_class **ctx)
 unsigned
 xm_end_chain(const br_x509_class **ctx)
 {
-	printf("[xm_end_chain]\n");
 	br_x509_minimal_context *cc;
 
 	cc = (br_x509_minimal_context *)(void *)ctx;
@@ -1241,7 +1233,6 @@ br_x509_minimal_run(void *t0ctx)
 		// r = 0;
 		r = CTX->itime(CTX->itime_ctx, nbd, nbs, nad, nas);
 		if (r < -1 || r > 1) {
-			printf("[check-validity-range] r: %d\n", r);
 			CTX->err = BR_ERR_X509_TIME_UNKNOWN;
 			T0_CO();
 		}

@@ -53,7 +53,6 @@ ec_all_m31_api_generator(int curve, size_t *len)
 const unsigned char *
 ec_all_m31_api_order(int curve, size_t *len)
 {
-	printf("in api_order: %d\n", curve);
 	switch (curve) {
 	case BR_EC_secp256r1:
 #if BR_INT128 || BR_UMUL128
@@ -66,7 +65,6 @@ ec_all_m31_api_order(int curve, size_t *len)
 #if BR_INT128 || BR_UMUL128
 		return br_ec_c25519_m64.order(curve, len);
 #else
-		printf("in api_order: %d\n", curve);
 		return ec_c_25519_m31_api_order(curve, len);
 		// return br_ec_c25519_m31.order(curve, len);
 #endif
