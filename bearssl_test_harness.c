@@ -367,11 +367,13 @@ void main() {
 	printf("sizeof(sc): %zu\n", sizeof(sc));
 	printf("sizeof(xc): %zu\n", sizeof(xc));
 	
-    br_sslio_write_all(&ioc, "GET ", 4);
-	br_sslio_write_all(&ioc, path, g_strlen(path));
-	br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
-	br_sslio_write_all(&ioc, host, g_strlen(host));
-	br_sslio_write_all(&ioc, "\r\n\r\n", 4);
+	br_sslio_write_all(&ioc, "cache me if u can, houdini\r\n\r\n", 30);
+	// br_sslio_write_all(&ioc, "\r\n\r\n", 4);
+    // br_sslio_write_all(&ioc, "GET ", 4);
+	// br_sslio_write_all(&ioc, path, g_strlen(path));
+	// br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
+	// br_sslio_write_all(&ioc, host, g_strlen(host));
+	// br_sslio_write_all(&ioc, "\r\n\r\n", 4);
     br_sslio_flush(&ioc);
 
 	for (;;) {
