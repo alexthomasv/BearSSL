@@ -403,7 +403,7 @@ eqbigint(const unsigned char *b1, size_t len1,
 	if (len1 != len2) {
 		return 0;
 	}
-	return memcmp(b1, b2, len1) == 0;
+	return g_memcmp(b1, b2, len1) == 0;
 }
 
 /*
@@ -1149,7 +1149,7 @@ br_x509_minimal_run(void *t0ctx)
 			continue;
 		}
 		hash_dn(CTX, ta->dn.data, ta->dn.len, hashed_DN);
-		if (memcmp(hashed_DN, CTX->current_dn_hash, DNHASH_LEN)) {
+		if (g_memcmp(hashed_DN, CTX->current_dn_hash, DNHASH_LEN)) {
 			continue;
 		}
 		kt = CTX->pkey.key_type;
@@ -1175,7 +1175,7 @@ br_x509_minimal_run(void *t0ctx)
 		case BR_KEYTYPE_EC:
 			if (CTX->pkey.key.ec.curve != ta->pkey.key.ec.curve
 				|| CTX->pkey.key.ec.qlen != ta->pkey.key.ec.qlen
-				|| memcmp(CTX->pkey.key.ec.q,
+				|| g_memcmp(CTX->pkey.key.ec.q,
 					ta->pkey.key.ec.q,
 					ta->pkey.key.ec.qlen) != 0)
 			{
@@ -1210,7 +1210,7 @@ br_x509_minimal_run(void *t0ctx)
 			continue;
 		}
 		hash_dn(CTX, ta->dn.data, ta->dn.len, hashed_DN);
-		if (memcmp(hashed_DN, CTX->saved_dn_hash, DNHASH_LEN)) {
+		if (g_memcmp(hashed_DN, CTX->saved_dn_hash, DNHASH_LEN)) {
 			continue;
 		}
 		if (verify_signature(CTX, &ta->pkey) == 0) {
@@ -1230,8 +1230,8 @@ br_x509_minimal_run(void *t0ctx)
 	uint32_t nad = T0_POP();
 	int r;
 	if (CTX->itime != 0) {
-		// r = 0;
-		r = CTX->itime(CTX->itime_ctx, nbd, nbs, nad, nas);
+		// r = CTX->itime(CTX->itime_ctx, nbd, nbs, nad, nas);
+		r = g_time(CTX->itime, CTX->itime_ctx, nbd, nbs, nad, nas);
 		if (r < -1 || r > 1) {
 			CTX->err = BR_ERR_X509_TIME_UNKNOWN;
 			T0_CO();
@@ -1439,7 +1439,7 @@ br_x509_minimal_run(void *t0ctx)
 	size_t len = a1[0];
 	int x;
 	if (len == a2[0]) {
-		x = -(memcmp(a1 + 1, a2 + 1, len) == 0);
+		x = -(g_memcmp(a1 + 1, a2 + 1, len) == 0);
 	} else {
 		x = 0;
 	}
@@ -1453,7 +1453,7 @@ br_x509_minimal_run(void *t0ctx)
 	size_t len = T0_POP();
 	const unsigned char *a2 = (const unsigned char *)CTX + T0_POP();
 	const unsigned char *a1 = (const unsigned char *)CTX + T0_POP();
-	T0_PUSHi(-(memcmp(a1, a2, len) == 0));
+	T0_PUSHi(-(g_memcmp(a1, a2, len) == 0));
 
 				}
 				break;
@@ -1490,7 +1490,7 @@ br_x509_minimal_run(void *t0ctx)
 		T0_PUSH(0);
 		T0_RET();
 	}
-	n1 = strlen(CTX->server_name);
+	n1 = g_strlen(CTX->server_name);
 	n2 = CTX->pad[0];
 	if (n1 == n2 && eqnocase(&CTX->pad[1], CTX->server_name, n1)) {
 		T0_PUSHi(-1);
@@ -1546,7 +1546,7 @@ br_x509_minimal_run(void *t0ctx)
 			}
 			len = oid[off];
 			if (len != 0 && len == CTX->pad[0]
-				&& memcmp(oid + off + 1,
+				&& g_memcmp(oid + off + 1,
 					CTX->pad + 1, len) == 0)
 			{
 				T0_PUSH(u);
@@ -1728,7 +1728,7 @@ verify_signature(br_x509_minimal_context *ctx, const br_x509_pkey *pk)
 		{
 			return BR_ERR_X509_BAD_SIGNATURE;
 		}
-		if (memcmp(ctx->tbs_hash, tmp, ctx->cert_sig_hash_len) != 0) {
+		if (g_memcmp(ctx->tbs_hash, tmp, ctx->cert_sig_hash_len) != 0) {
 			return BR_ERR_X509_BAD_SIGNATURE;
 		}
 		return 0;

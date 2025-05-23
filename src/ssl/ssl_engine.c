@@ -1357,8 +1357,11 @@ br_ssl_engine_compute_master(br_ssl_engine_context *cc,
 	};
 
 	iprf = br_ssl_engine_get_PRF(cc, prf_id);
-	iprf(cc->session.master_secret, sizeof cc->session.master_secret,
-		pms, pms_len, "master secret", 2, seed);
+	g_prf(iprf, cc->session.master_secret, sizeof cc->session.master_secret,
+			pms, pms_len, "master secret", 2, seed);
+
+	// iprf(cc->session.master_secret, sizeof cc->session.master_secret,
+	// 	pms, pms_len, "master secret", 2, seed);
 }
 
 /*

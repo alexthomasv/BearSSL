@@ -348,9 +348,9 @@ void main() {
 	printf("sizeof(ioc): %zu\n", sizeof(ioc));
 	
     br_sslio_write_all(&ioc, "GET ", 4);
-	br_sslio_write_all(&ioc, path, strlen(path));
+	br_sslio_write_all(&ioc, path, g_strlen(path));
 	br_sslio_write_all(&ioc, " HTTP/1.0\r\nHost: ", 17);
-	br_sslio_write_all(&ioc, host, strlen(host));
+	br_sslio_write_all(&ioc, host, g_strlen(host));
 	br_sslio_write_all(&ioc, "\r\n\r\n", 4);
     br_sslio_flush(&ioc);
 

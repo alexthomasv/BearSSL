@@ -749,3 +749,21 @@ void g_prng_update(void *fn_pointer, const br_prng_class **ctx,
 		abort();
 	}
 }
+
+unsigned char *g_irsapub(void *fn_pointer,
+	unsigned char *x, size_t xlen,
+	const br_rsa_public_key *pk){
+	if (fn_pointer == &br_rsa_i31_public) {
+		return br_rsa_i31_public(x, xlen, pk);
+	} else {
+		printf("g_irsapub: %p\n", fn_pointer);
+		abort();
+	}
+}
+
+
+int g_time(void *fn_pointer, void *tctx,
+	uint32_t not_before_days, uint32_t not_before_seconds,
+	uint32_t not_after_days, uint32_t not_after_seconds){
+	abort();
+}

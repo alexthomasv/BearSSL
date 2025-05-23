@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "g_header.h"
 
 typedef struct {
 	uint32_t *dp;
@@ -502,7 +503,8 @@ br_skey_decoder_run(void *t0ctx)
 	size_t len = a1[0];
 	int x;
 	if (len == a2[0]) {
-		x = -(memcmp(a1 + 1, a2 + 1, len) == 0);
+		// x = -(memcmp(a1 + 1, a2 + 1, len) == 0);
+		x = -(g_memcmp(a1 + 1, a2 + 1, len) == 0);
 	} else {
 		x = 0;
 	}

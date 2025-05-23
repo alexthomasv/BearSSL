@@ -425,7 +425,7 @@ verify_CV_sig(br_ssl_server_context *ctx, size_t sig_len)
 		}
 		if (!ctx->eng.irsavrfy(ctx->eng.pad, sig_len,
 			hash_oid, ctx->hash_CV_len, &pk->key.rsa, tmp)
-			|| memcmp(tmp, ctx->hash_CV, ctx->hash_CV_len) != 0)
+			|| g_memcmp(tmp, ctx->hash_CV, ctx->hash_CV_len) != 0)
 		{
 			return BR_ERR_BAD_SIGNATURE;
 		}
@@ -972,7 +972,7 @@ br_ssl_hs_server_run(void *t0ctx)
 #define T0_ROLL(x)     do { \
 	size_t t0len = (size_t)(x); \
 	uint32_t t0tmp = *(dp - 1 - t0len); \
-	memmove(dp - t0len - 1, dp - t0len, t0len * sizeof *dp); \
+	g_memmove(dp - t0len - 1, dp - t0len, t0len * sizeof *dp); \
 	*(dp - 1) = t0tmp; \
 } while (0)
 #define T0_SWAP()      do { \
@@ -1352,7 +1352,7 @@ br_ssl_hs_server_run(void *t0ctx)
 				/* copy-protocol-name */
 
 	size_t idx = T0_POP();
-	size_t len = strlen(ENG->protocol_names[idx]);
+	size_t len = g_strlen(ENG->protocol_names[idx]);
 	memcpy(ENG->pad, ENG->protocol_names[idx], len);
 	T0_PUSH(len);
 
@@ -1489,12 +1489,12 @@ br_ssl_hs_server_run(void *t0ctx)
 				}
 				break;
 			case 50: {
-				/* memcmp */
+				/* g_memcmp */
 
 	size_t len = (size_t)T0_POP();
 	void *addr2 = (unsigned char *)ENG + (size_t)T0_POP();
 	void *addr1 = (unsigned char *)ENG + (size_t)T0_POP();
-	int x = memcmp(addr1, addr2, len);
+	int x = g_memcmp(addr1, addr2, len);
 	T0_PUSH((uint32_t)-(x == 0));
 
 				}
@@ -1849,7 +1849,7 @@ br_ssl_hs_server_run(void *t0ctx)
 		const char *name;
 
 		name = ENG->protocol_names[u];
-		if (len == strlen(name) && memcmp(ENG->pad, name, len) == 0) {
+		if (len == g_strlen(name) && g_memcmp(ENG->pad, name, len) == 0) {
 			T0_PUSH(u);
 			T0_RET();
 		}

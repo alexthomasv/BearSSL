@@ -217,6 +217,14 @@ uint32_t g_irsavrfy(void *fn_pointer, const unsigned char *x, size_t xlen,
 const br_x509_pkey *g_get_pkey(void *fn_pointer,
 		const br_x509_class *const *ctx, unsigned *usages);
 
+int g_time(void *fn_pointer, void *tctx,
+	uint32_t not_before_days, uint32_t not_before_seconds,
+	uint32_t not_after_days, uint32_t not_after_seconds);
+
+unsigned char *g_irsapub(void *fn_pointer,
+	unsigned char *x, size_t xlen,
+	const br_rsa_public_key *pk);
+
 // Needed for ssl_engine.c
 extern void in_ccm_init(br_sslrec_ccm_context *cc,
 	const br_block_ctrcbc_class *bc_impl,
@@ -382,4 +390,92 @@ xm_get_pkey(const br_x509_class *const *ctx, unsigned *usages);
 extern void xm_end_cert(const br_x509_class **ctx);
 
 extern unsigned xm_end_chain(const br_x509_class **ctx);
+
+extern uint32_t
+br_rsa_i31_public(unsigned char *x, size_t xlen,
+	const br_rsa_public_key *pk);
+
+#ifndef TEST
+inline __attribute__((always_inline))
+int g_memcmp(const void *str1, const void *str2, size_t n)
+{
+    const unsigned char *s1 = (const unsigned char *)str1;
+	const unsigned char *s2 = (const unsigned char *)str2;
+
+	while (n--) {
+		if (*s1 != *s2) {
+		int result = __VERIFIER_nondet_int();
+		if (*s1 < *s2) {
+			__VERIFIER_assume(result < 0);
+		} else {
+			__VERIFIER_assume(result > 0);
+		}
+		return result;
+		}
+		s1++;
+		s2++;
+	}
+	return 0;
+}
+
+inline __attribute__((always_inline))
+size_t g_strlen(const char *str) {
+  size_t count = 0;
+  while (str[count])
+    count++;
+  return count;
+}
+
+inline __attribute__((always_inline))
+void *g_memmove(void *dest, const void *src, size_t n)
+{
+    unsigned char       *d = (unsigned char *)dest;
+    const unsigned char *s = (const unsigned char *)src;
+
+    /* Trivial cases: nothing to do. */
+    if (d == s || n == 0)
+        return dest;
+
+    /*
+     * Decide copy direction:
+     *   – If destination starts before source, they either don’t overlap
+     *     or overlap with dest in the *front* part → copy **forward**.
+     *   – Otherwise destination is after source → copy **backward**.
+     *
+     *  Copying in the correct direction prevents the source byte
+     *  from being overwritten before we read it.
+     */
+    if (d < s) {
+        /* ---------- forward copy ---------- */
+        for (size_t i = 0; i < n; ++i)
+            d[i] = s[i];
+    } else {
+        /* ---------- backward copy ---------- */
+        /* Start from the last byte and move toward the first. */
+        for (size_t i = n; i-- > 0; )
+            d[i] = s[i];
+    }
+
+    return dest;
+}
+#else
+
+inline __attribute__((always_inline))
+size_t g_strlen(const char *str) {
+  return strlen(str);
+}
+
+inline __attribute__((always_inline))
+int g_memcmp(const void *str1, const void *str2, size_t n) {
+  return memcmp(str1, str2, n);
+}
+
+inline __attribute__((always_inline))
+void *g_memmove(void *dest, const void *src, size_t n)
+{
+    return memmove(dest, src, n);
+}
+
+#endif /* __SMACK__ */
+
 #endif /* GENERIC_WRAPPERS_H */
