@@ -356,16 +356,16 @@ ec_all_m31_api_order(int curve, size_t *len);
 extern const unsigned char *
 ec_all_m31_api_generator(int curve, size_t *len);
 
-uint32_t
+extern uint32_t
 ec_all_m31_api_mul(unsigned char *G, size_t Glen,
 	const unsigned char *kb, size_t kblen, int curve);
 
-uint32_t
+extern uint32_t
 ec_all_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve);
-	
-size_t
+
+extern size_t
 ec_all_m31_api_mulgen(unsigned char *R,
 	const unsigned char *x, size_t xlen, int curve);
 
@@ -394,6 +394,103 @@ extern unsigned xm_end_chain(const br_x509_class **ctx);
 extern uint32_t
 br_rsa_i31_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
+
+extern void
+clear_max_plaintext(const br_sslrec_out_clear_context *cc,
+	size_t *start, size_t *end);
+
+extern void
+cbc_max_plaintext(const br_sslrec_out_cbc_context *cc,
+	size_t *start, size_t *end);
+
+extern void
+gcm_max_plaintext(const br_sslrec_gcm_context *cc,
+	size_t *start, size_t *end);
+
+extern void
+ccm_max_plaintext(const br_sslrec_ccm_context *cc,
+	size_t *start, size_t *end);
+
+extern void
+chapol_max_plaintext(const br_sslrec_chapol_context *cc,
+	size_t *start, size_t *end);
+
+extern unsigned char *
+clear_encrypt(br_sslrec_out_clear_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+cbc_encrypt(br_sslrec_out_cbc_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+gcm_encrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+ccm_encrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+chapol_encrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+cbc_decrypt(br_sslrec_in_cbc_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+gcm_decrypt(br_sslrec_gcm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+ccm_decrypt(br_sslrec_ccm_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern unsigned char *
+chapol_decrypt(br_sslrec_chapol_context *cc,
+	int record_type, unsigned version, void *data, size_t *data_len);
+
+extern int cbc_check_length(const br_sslrec_in_cbc_context *cc, size_t rlen);
+extern int gcm_check_length(const br_sslrec_gcm_context *cc, size_t rlen);
+extern int ccm_check_length(const br_sslrec_ccm_context *cc, size_t rlen);
+extern int chapol_check_length(const br_sslrec_chapol_context *cc, size_t rlen);
+
+
+extern void br_poly1305_ctmul_run(const void *key, const void *iv,
+	void *data, size_t len, const void *aad, size_t aad_len,
+	void *tag, br_chacha20_run ichacha, int encrypt);
+
+extern uint32_t
+ec_c_25519_i15_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern uint32_t
+ec_c_25519_i31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern uint32_t
+ec_c_25519_m15_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern uint32_t
+ec_c_25519_m31_api_muladd(unsigned char *A, const unsigned char *B, size_t len,
+	const unsigned char *x, size_t xlen,
+	const unsigned char *y, size_t ylen, int curve);
+
+extern uint32_t
+br_ecdsa_i31_vrfy_asn1(const br_ec_impl *impl,
+	const void *hash, size_t hash_len,
+	const br_ec_public_key *pk, const void *sig, size_t sig_len);
+
+extern int
+sock_read(void *ctx, unsigned char *buf, size_t len);
+
+extern int
+sock_write(void *ctx, const unsigned char *buf, size_t len);
 
 #ifndef TEST
 #include <smack.h>

@@ -90,6 +90,12 @@ static const br_x509_trust_anchor TAs[2] = {
 };
 #define TAs_NUM   2
 
+void dump_buffer(unsigned char *buf, size_t len) {
+	for (size_t i = 0; i < len; ++i)
+        printf("%02X", buf[i]);   /* no spaces */
+    putchar('\n');
+}
+
 int
 sock_read(void *ctx, unsigned char *buf, size_t len)
 {
@@ -103,6 +109,9 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 			}
 			return -1;
 		}
+		printf("msg: rlen: %zu\n", rlen);
+		dump_buffer(buf, rlen);
+		printf("msg end\n");
 		return (int)rlen;
 	}
 }
@@ -120,6 +129,7 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
 			}
 			return -1;
 		}
+		// dump_buffer(buf, wlen);
 		return (int)wlen;
 	}
 }

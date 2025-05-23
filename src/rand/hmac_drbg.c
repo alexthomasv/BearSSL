@@ -69,7 +69,6 @@ br_hmac_drbg_generate(br_hmac_drbg_context *ctx, void *out, size_t len)
 		buf += clen;
 		len -= clen;
 	}
-	printf("after while loop\n");
 	/*
 	 * To prepare the state for the next request, we should call
 	 * br_hmac_drbg_update() with an empty additional seed. However,

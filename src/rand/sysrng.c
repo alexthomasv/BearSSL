@@ -147,12 +147,19 @@ seeder_urandom(const br_prng_class **ctx)
  * enabled).
  */
 #if BR_USE_GETENTROPY
+int fake_getentropy(unsigned char *tmp, size_t len) {
+	for (size_t i = 0; i < len; ++i) {
+		tmp[i] = (unsigned char)(i + 1);   /* 1, 2, 3, … 32 */
+	}
+	return 0;
+}
+
 static int
 seeder_getentropy(const br_prng_class **ctx)
 {
 	unsigned char tmp[32];
 
-	if (getentropy(tmp, sizeof tmp) == 0) {
+	if (fake_getentropy(tmp, sizeof tmp) == 0) {
 		g_prng_update((*ctx)->update, ctx, tmp, sizeof tmp);
 		// (*ctx)->update(ctx, tmp, sizeof tmp);
 		return 1;
