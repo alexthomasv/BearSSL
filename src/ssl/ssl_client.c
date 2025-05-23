@@ -50,10 +50,8 @@ br_ssl_client_reset(br_ssl_client_context *cc,
 	cc->eng.version_out = cc->eng.version_min;
 	if (!resume_session) {
 		br_ssl_client_forget_session(cc);
-		printf("after forget session\n");
 	}
 	if (!br_ssl_engine_init_rand(&cc->eng)) {
-		printf("after init rand\n");
 		return 0;
 	}
 
@@ -78,6 +76,5 @@ br_ssl_client_reset(br_ssl_client_context *cc,
 
 	br_ssl_engine_hs_reset(&cc->eng,
 		br_ssl_hs_client_init_main, br_ssl_hs_client_run);
-	printf("after hs reset: %d\n", br_ssl_engine_last_error(&cc->eng));
 	return br_ssl_engine_last_error(&cc->eng) == BR_ERR_OK;
 }

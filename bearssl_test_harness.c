@@ -90,6 +90,10 @@ static const br_x509_trust_anchor TAs[2] = {
 };
 #define TAs_NUM   2
 
+unsigned char iobuf[BR_SSL_BUFSIZE_BIDI];
+int fd = 0;
+const char *host = "localhost";
+
 void dump_buffer(unsigned char *buf, size_t len) {
 	for (size_t i = 0; i < len; ++i)
         printf("%02X", buf[i]);   /* no spaces */
@@ -134,30 +138,38 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
 	}
 }
 
+int br_sslio_write_all_wrapper(
+			unsigned char *ioc, 
+			unsigned char *xc, 
+			unsigned char *sc, 
+			unsigned char *src, 
+			unsigned long long len) {
+    public_in(__SMACK_value(ioc));
+	public_in(__SMACK_value(xc));
+	public_in(__SMACK_value(src));
+	public_in(__SMACK_value(len));
 
-int br_sslio_write_all_wrapper(unsigned char *ioc, unsigned char *src, size_t len) {
-    __SMACK_values(ioc, 40);
-    __SMACK_values(src, 32);
+	public_in(__SMACK_values(ioc, 40));
+    public_in(__SMACK_values(sc, 3720));
+    public_in(__SMACK_values(xc, 3176));
+    public_in(__SMACK_values(src, 32));
+	
+	
+	// br_sslio_context ioc;
+    // br_ssl_client_context sc;
+	// br_x509_minimal_context xc;
 
-    br_ssl_client_context sc;
-	br_x509_minimal_context xc;
-	unsigned char iobuf[BR_SSL_BUFSIZE_BIDI];
-	int fd = 0;
-	const char *host = "www.google.com";
 
-    br_ssl_client_init_full(&sc, &xc, TAs, TAs_NUM);
-	br_ssl_engine_set_buffer(&sc.eng, iobuf, sizeof iobuf, 1);
-	br_ssl_client_reset(&sc, host, 0);
-    
-    br_sslio_init(ioc, &sc.eng, sock_read, &fd, sock_write, &fd);
-
-    // __SMACK_value(len);
+    br_ssl_client_init_full(sc, xc, TAs, TAs_NUM);
+	br_ssl_engine_set_buffer(&((br_ssl_client_context *)sc)->eng, iobuf, sizeof iobuf, 1);
+	br_ssl_client_reset(sc, host, 0);
+    br_sslio_init(ioc, &((br_ssl_client_context *)sc)->eng, sock_read, &fd, sock_write, &fd);
     return br_sslio_write_all(ioc, src, len);
 }
 
-void br_sslio_read_all_wrapper(void *ctx, void *dst, size_t len) {
-    br_sslio_read_all(ctx, dst, len);
-}
+// void br_sslio_read_all_wrapper(void *ctx, void *dst, size_t len) {
+//     br_sslio_read_all(ctx, dst, len);
+// }
 
 
 #ifdef TEST
@@ -335,8 +347,6 @@ void main() {
 	br_sslio_context ioc;
 	br_ssl_client_context sc;
 	br_x509_minimal_context xc;
-	unsigned char iobuf[BR_SSL_BUFSIZE_BIDI];
-	const char *host = "localhost";
     const char *port = "5000";
 	const char *path = "/";
 
@@ -345,17 +355,17 @@ void main() {
 		return -1;
 	}
 
-	printf("fd: %d\n", fd);
-
 	br_ssl_client_init_full(&sc, &xc, TAs, TAs_NUM);
 	br_ssl_engine_set_buffer(&sc.eng, iobuf, sizeof iobuf, 1);
     br_ssl_client_reset(&sc, host, 0);
 	br_sslio_init(&ioc, &sc.eng, sock_read, &fd, sock_write, &fd);
 
-    dump_ssl_client(&sc);
-    dump_x509_minimal(&xc);
-    print_session_secret(&sc);
+    // dump_ssl_client(&sc);
+    // dump_x509_minimal(&xc);
+    // print_session_secret(&sc);
 	printf("sizeof(ioc): %zu\n", sizeof(ioc));
+	printf("sizeof(sc): %zu\n", sizeof(sc));
+	printf("sizeof(xc): %zu\n", sizeof(xc));
 	
     br_sslio_write_all(&ioc, "GET ", 4);
 	br_sslio_write_all(&ioc, path, g_strlen(path));
