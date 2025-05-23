@@ -396,6 +396,7 @@ br_rsa_i31_public(unsigned char *x, size_t xlen,
 	const br_rsa_public_key *pk);
 
 #ifndef TEST
+#include <smack.h>
 inline __attribute__((always_inline))
 int g_memcmp(const void *str1, const void *str2, size_t n)
 {
