@@ -14,6 +14,7 @@
  * command-line tool (with the "ta" command).
  */
 
+const char *host = "localhost";
 static const unsigned char TA0_DN[] = {
 	0x30, 0x1C, 0x31, 0x0B, 0x30, 0x09, 0x06, 0x03, 0x55, 0x04, 0x06, 0x13,
 	0x02, 0x43, 0x41, 0x31, 0x0D, 0x30, 0x0B, 0x06, 0x03, 0x55, 0x04, 0x03,
@@ -66,8 +67,8 @@ static const unsigned char TA1_EC_Q[] = {
 
 static const br_x509_trust_anchor TAs[2] = {
 	{
-		{ (unsigned char *)TA0_DN, sizeof TA0_DN },
-		BR_X509_TA_CA,
+		{ (unsigned char *)TA0_DN, 30UL }, // dn
+		BR_X509_TA_CA, // flags
 		{
 			BR_KEYTYPE_RSA,
 			{ .rsa = {
@@ -77,7 +78,7 @@ static const br_x509_trust_anchor TAs[2] = {
 		}
 	},
 	{
-		{ (unsigned char *)TA1_DN, sizeof TA1_DN },
+		{ (unsigned char *)TA1_DN, 30UL },
 		BR_X509_TA_CA,
 		{
 			BR_KEYTYPE_EC,
@@ -92,7 +93,6 @@ static const br_x509_trust_anchor TAs[2] = {
 
 unsigned char iobuf[BR_SSL_BUFSIZE_BIDI];
 int fd = 0;
-const char *host = "localhost";
 
 void dump_buffer(unsigned char *buf, size_t len) {
 	for (size_t i = 0; i < len; ++i)
@@ -106,7 +106,7 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 	for (;;) {
 		ssize_t rlen;
 
-		rlen = read(*(int *)ctx, buf, len);
+		rlen = read(*(int *)ctx, buf, len); printf("$i201459 <- 0x%x $bb7577\n", rlen);
 		if (rlen <= 0) {
 			if (rlen < 0 && errno == EINTR) {
 				continue;
@@ -126,7 +126,7 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
 	for (;;) {
 		ssize_t wlen;
 
-		wlen = write(*(int *)ctx, buf, len);
+		wlen = write(*(int *)ctx, buf, len); printf("msg: wlen: %zu\n", wlen); dump_buffer(buf, wlen); printf("msg end\n");
 		if (wlen <= 0) {
 			if (wlen < 0 && errno == EINTR) {
 				continue;
@@ -137,29 +137,33 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
 		return (int)wlen;
 	}
 }
-
+// 0x6c6f63616c686f737400
 int br_sslio_write_all_wrapper(
 			unsigned char *ioc, 
 			unsigned char *xc, 
-			unsigned char *sc, 
+			unsigned char *sc,
 			unsigned char *src, 
 			unsigned long long len) {
     public_in(__SMACK_value(ioc));
 	public_in(__SMACK_value(xc));
+	public_in(__SMACK_value(sc));
 	public_in(__SMACK_value(src));
 	public_in(__SMACK_value(len));
 
 	public_in(__SMACK_values(ioc, 40));
     public_in(__SMACK_values(sc, 3720));
     public_in(__SMACK_values(xc, 3176));
-    public_in(__SMACK_values(src, 32));
-	
+    public_in(__SMACK_values(src, 30));
 	
 	// br_sslio_context ioc;
     // br_ssl_client_context sc;
 	// br_x509_minimal_context xc;
-
-
+	for (int i = 0; i < sizeof(TA0_DN); i++) printf(TA0_DN[i]);
+	for (int i = 0; i < sizeof(TA0_RSA_N); i++) printf(TA0_RSA_N[i]);
+	for (int i = 0; i < sizeof(TA0_RSA_E); i++) printf(TA0_RSA_E[i]);
+	for (int i = 0; i < sizeof(TA1_DN); i++) printf(TA1_DN[i]);
+	for (int i = 0; i < sizeof(TA1_EC_Q); i++) printf(TA1_EC_Q[i]);
+	
     br_ssl_client_init_full(sc, xc, TAs, TAs_NUM);
 	br_ssl_engine_set_buffer(&((br_ssl_client_context *)sc)->eng, iobuf, sizeof iobuf, 1);
 	br_ssl_client_reset(sc, host, 0);
