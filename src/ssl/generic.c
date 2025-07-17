@@ -598,7 +598,6 @@ void generic_hs_run(void *fn_pointer, void *cc){
 	// 	br_ssl_hs_server_run(cc);
 	// } 
 	else {
-		printf("generic_hs_run: %p, %p, %p\n", fn_pointer, br_ssl_hs_server_run, &br_ssl_hs_server_run);
 		abort();
 	}
 

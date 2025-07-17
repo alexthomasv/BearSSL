@@ -21,8 +21,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-#include "inner.h"
+#include "inner.h" 
+#include <stdio.h>
 
 /*
  * As a strict minimum, we need four buffers that can hold a

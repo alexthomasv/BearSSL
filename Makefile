@@ -43,3 +43,6 @@ ifndef: all
 endif: all
 # \
 !endif
+
+server_basic:
+	gcc samples/server_basic.c -o server_basic -I ./inc build/libbearssl.a

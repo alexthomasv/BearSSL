@@ -482,35 +482,35 @@ typedef uint32_t (*br_rsa_pss_sign)(const br_prng_class **rng,
 	const unsigned char *hash_value, size_t salt_len,
 	const br_rsa_private_key *sk, unsigned char *x);
 
-/**
- * \brief Encoded OID for SHA-1 (in RSA PKCS#1 signatures).
- */
-#define BR_HASH_OID_SHA1     \
-	((const unsigned char *)"\x05\x2B\x0E\x03\x02\x1A")
+// /**
+//  * \brief Encoded OID for SHA-1 (in RSA PKCS#1 signatures).
+//  */
+// #define BR_HASH_OID_SHA1     \
+// 	((const unsigned char *)"\x05\x2B\x0E\x03\x02\x1A")
 
-/**
- * \brief Encoded OID for SHA-224 (in RSA PKCS#1 signatures).
- */
-#define BR_HASH_OID_SHA224   \
-	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x04")
+// /**
+//  * \brief Encoded OID for SHA-224 (in RSA PKCS#1 signatures).
+//  */
+// #define BR_HASH_OID_SHA224   \
+// 	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x04")
 
-/**
- * \brief Encoded OID for SHA-256 (in RSA PKCS#1 signatures).
- */
-#define BR_HASH_OID_SHA256   \
-	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01")
+// /**
+//  * \brief Encoded OID for SHA-256 (in RSA PKCS#1 signatures).
+//  */
+// #define BR_HASH_OID_SHA256   \
+// 	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01")
 
-/**
- * \brief Encoded OID for SHA-384 (in RSA PKCS#1 signatures).
- */
-#define BR_HASH_OID_SHA384   \
-	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x02")
+// /**
+//  * \brief Encoded OID for SHA-384 (in RSA PKCS#1 signatures).
+//  */
+// #define BR_HASH_OID_SHA384   \
+// 	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x02")
 
-/**
- * \brief Encoded OID for SHA-512 (in RSA PKCS#1 signatures).
- */
-#define BR_HASH_OID_SHA512   \
-	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x03")
+// /**
+//  * \brief Encoded OID for SHA-512 (in RSA PKCS#1 signatures).
+//  */
+// #define BR_HASH_OID_SHA512   \
+// 	((const unsigned char *)"\x09\x60\x86\x48\x01\x65\x03\x04\x02\x03")
 
 /**
  * \brief Type for a RSA decryption engine (OAEP).

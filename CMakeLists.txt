@@ -27,7 +27,7 @@ endforeach()
 message(STATUS "BearSSL sources: ${ALL_C_SOURCES}")
 
 set(TLS_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/
     ${CMAKE_CURRENT_SOURCE_DIR}/src/
 )
 
@@ -38,8 +38,6 @@ add_smack_target(bearssl_test
     SOURCES
         bearssl_test_harness.c
         ${ALL_C_SOURCES}
-    CLANG_FLAGS
-        ${APP_FLAGS}
 )
 
 add_executable(bearssl_test_native bearssl_test_harness.c ${ALL_C_SOURCES})

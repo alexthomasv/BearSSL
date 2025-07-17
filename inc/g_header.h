@@ -493,7 +493,6 @@ extern int
 sock_write(void *ctx, const unsigned char *buf, size_t len);
 
 #ifndef TEST
-#include <smack.h>
 inline __attribute__((always_inline))
 int g_memcmp(const void *str1, const void *str2, size_t n)
 {
@@ -502,13 +501,13 @@ int g_memcmp(const void *str1, const void *str2, size_t n)
 
 	while (n--) {
 		if (*s1 != *s2) {
-		int result = __VERIFIER_nondet_int();
-		if (*s1 < *s2) {
-			__VERIFIER_assume(result < 0);
-		} else {
-			__VERIFIER_assume(result > 0);
-		}
-		return result;
+			int result;
+			if (*s1 < *s2) {
+				result = -1;
+			} else {
+				result = 1;
+			}
+			return result;
 		}
 		s1++;
 		s2++;

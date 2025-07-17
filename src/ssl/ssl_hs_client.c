@@ -136,7 +136,7 @@ make_pms_rsa(br_ssl_client_context *ctx, int prf_id)
 	if (nlen > sizeof ctx->eng.pad) {
 		return -BR_ERR_LIMIT_EXCEEDED;
 	}
-
+	printf("pkey:\n"); for (int i = 0; i < nlen; i++) { printf("%02x", pk->key.rsa.n[i]); } printf("\n");
 	/*
 	 * Make PMS.
 	 */
@@ -169,6 +169,22 @@ make_pms_rsa(br_ssl_client_context *ctx, int prf_id)
 	return (int)nlen;
 }
 
+static const unsigned char BR_HASH_OID_SHA1[] = {
+	0x05, 0x2B, 0x0E, 0x03, 0x02, 0x1A
+};
+static const unsigned char BR_HASH_OID_SHA224[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04
+};
+static const unsigned char BR_HASH_OID_SHA256[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01
+};
+static const unsigned char BR_HASH_OID_SHA384[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02
+};
+static const unsigned char BR_HASH_OID_SHA512[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03
+};
+
 /*
  * OID for hash functions in RSA signatures.
  */
@@ -193,6 +209,14 @@ static int
 verify_SKE_sig(br_ssl_client_context *ctx,
 	int hash, int use_rsa, size_t sig_len)
 {
+	#ifndef TEST
+	for (int i = 0; i < sizeof(HASH_OID); i++) printf(HASH_OID[i]);
+	for (int i = 0; i < sizeof(BR_HASH_OID_SHA1); i++) printf(BR_HASH_OID_SHA1[i]);
+	for (int i = 0; i < sizeof(BR_HASH_OID_SHA224); i++) printf(BR_HASH_OID_SHA224[i]);
+	for (int i = 0; i < sizeof(BR_HASH_OID_SHA256); i++) printf(BR_HASH_OID_SHA256[i]);
+	for (int i = 0; i < sizeof(BR_HASH_OID_SHA384); i++) printf(BR_HASH_OID_SHA384[i]);
+	for (int i = 0; i < sizeof(BR_HASH_OID_SHA512); i++) printf(BR_HASH_OID_SHA512[i]);
+	#endif
 	const br_x509_class **xc;
 	const br_x509_pkey *pk;
 	br_multihash_context mhc;
@@ -228,8 +252,8 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 			return BR_ERR_INVALID_ALGORITHM;
 		}
 		hv_len = 36;
-	}
-	if (use_rsa) {
+	} printf("use_rsa: %d\n", use_rsa);
+	if (use_rsa) { printf("using rsa: %d\n", use_rsa);
 		unsigned char tmp[64];
 		const unsigned char *hash_oid;
 
@@ -237,7 +261,7 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 			hash_oid = HASH_OID[hash - 2];
 		} else {
 			hash_oid = NULL;
-		}
+		} printf("hash_oid:\n"); for (int i = 0; i < hv_len; i++) { printf("%02x", hash_oid[i]); } printf("\n");
 		// if (!ctx->eng.irsavrfy(ctx->eng.pad, sig_len,
 		// 	hash_oid, hv_len, &pk->key.rsa, tmp)
 		// 	|| g_memcmp(tmp, hv, hv_len) != 0)
@@ -247,7 +271,7 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 		{
 			return BR_ERR_BAD_SIGNATURE;
 		}
-	} else {
+	} else { printf("not using rsa: %d\n", use_rsa);
 		// if (!ctx->eng.iecdsa(ctx->eng.iec, hv, hv_len, &pk->key.ec,
 		// 	ctx->eng.pad, sig_len))
 		if (!g_iecdsa(ctx->eng.iecdsa, ctx->eng.iec, hv, hv_len, &pk->key.ec,
@@ -322,7 +346,7 @@ make_pms_ecdh(br_ssl_client_context *ctx, unsigned ecdhe, int prf_id)
 		return -BR_ERR_INVALID_ALGORITHM;
 	}
 
-	memcpy(point, point_src, glen);
+	memcpy(point, point_src, glen); printf("point:\n"); for (int i = 0; i < glen; i++) printf("%02x", point[i]); printf("\n");
 	// if (!ctx->eng.iec->mul(point, glen, key, olen, curve)) {
 	if (!g_mul(ctx->eng.iec->mul, point, glen, key, olen, curve)) {
 		return -BR_ERR_INVALID_ALGORITHM;
@@ -976,7 +1000,7 @@ br_ssl_hs_client_run(void *t0ctx)
 		uint32_t t0x;
 
 	t0_next:
-		t0x = T0_NEXT(&ip);
+		t0x = T0_NEXT(&ip); printf("inline$br_ssl_hs_client_run.cross_product$2$$i156 <- 0x%x inline$br_ssl_hs_client_run.cross_product$2$$bb2 10219276\n", t0x);
 		if (t0x < T0_INTERPRETED) {
 			switch (t0x) {
 				int32_t t0off;
@@ -1030,7 +1054,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	uint32_t b = T0_POP();
 	uint32_t a = T0_POP();
-	T0_PUSH(a + b);
+	T0_PUSH(a + b); printf("inline$br_ssl_hs_client_run.cross_product$0$$i422 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", a + b);
 
 				}
 				break;
@@ -1039,7 +1063,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	uint32_t b = T0_POP();
 	uint32_t a = T0_POP();
-	T0_PUSH(a - b);
+	T0_PUSH(a - b); printf("inline$br_ssl_hs_client_run.cross_product$1$$i430 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", a - b);
 
 				}
 				break;
@@ -1279,7 +1303,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* data-get8 */
 
 	size_t addr = T0_POP();
-	T0_PUSH(t0_datablock[addr]);
+	T0_PUSH(t0_datablock[addr]); printf("inline$br_ssl_hs_client_run.cross_product$0$$i93026 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", t0_datablock[addr]);
 
 				}
 				break;
@@ -1438,7 +1462,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get16 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*(uint16_t *)(void *)((unsigned char *)ENG + addr));
+	T0_PUSH(*(uint16_t *)(void *)((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$0$$i125128 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *(uint16_t *)(void *)((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1446,7 +1470,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get32 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*(uint32_t *)(void *)((unsigned char *)ENG + addr));
+	T0_PUSH(*(uint32_t *)(void *)((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$0$$i125140 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *(uint32_t *)(void *)((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1454,7 +1478,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get8 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*((unsigned char *)ENG + addr));
+	T0_PUSH(*((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$1$$i125151 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1549,7 +1573,7 @@ br_ssl_hs_client_run(void *t0ctx)
 		if ((size_t)len < clen) {
 			clen = (size_t)len;
 		}
-		memcpy((unsigned char *)ENG + addr, ENG->hbuf_in, clen);
+		memcpy((unsigned char *)ENG + addr, ENG->hbuf_in, clen); printf("hbuf_in:\n"); for (int i = 0; i < clen; i++) printf("%02x", ENG->hbuf_in[i]); printf("\n");
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
 			br_multihash_update(&ENG->mhash, ENG->hbuf_in, clen);
 		}
@@ -1565,7 +1589,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* read8-native */
 	if (ENG->hlen_in > 0) {
 		unsigned char x;
-		x = *ENG->hbuf_in ++;
+		x = *ENG->hbuf_in ++; printf("inline$br_ssl_hs_client_run.cross_product$0$$i212396 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", x);
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
 			br_multihash_update(&ENG->mhash, &x, 1);
 		}
@@ -1619,7 +1643,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* g_strlen */
 
 	void *str = (unsigned char *)ENG + (size_t)T0_POP();
-	T0_PUSH((uint32_t)g_strlen(str));
+	T0_PUSH((uint32_t)g_strlen(str)); printf("inline$br_ssl_hs_client_run.cross_product$2$$i215603 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", T0_PEEK(0));
 
 				}
 				break;
@@ -1823,11 +1847,11 @@ br_ssl_hs_client_run(void *t0ctx)
 			case 80: {
 				/* verify-SKE-sig */
 
-	size_t sig_len = T0_POP();
-	int use_rsa = T0_POPi();
-	int hash = T0_POPi();
+	size_t sig_len = T0_POP(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786219 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", sig_len);
+	int use_rsa = T0_POPi(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786222 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", use_rsa);
+	int hash = T0_POPi(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786225 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", hash);
 
-	T0_PUSH(verify_SKE_sig(CTX, hash, use_rsa, sig_len));
+	T0_PUSH(verify_SKE_sig(CTX, hash, use_rsa, sig_len)); printf("verify_SKE_sig: %d\n", T0_PEEK(0));
 
 				}
 				break;

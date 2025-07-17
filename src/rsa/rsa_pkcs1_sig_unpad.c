@@ -40,7 +40,7 @@ br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 
 	if (sig_len < 11) {
 		return 0;
-	}
+	} printf("sig_len: %d\n", sig_len);
 
 	/*
 	 * Expected format:
@@ -74,7 +74,7 @@ br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 	 */
 	if (g_memcmp(sig, pad1, sizeof pad1) != 0) {
 		return 0;
-	}
+	} 
 	for (u = sizeof pad1; u < sig_len; u ++) {
 		if (sig[u] != 0xFF) {
 			break;
@@ -92,10 +92,10 @@ br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 			return 0;
 		}
 	} else {
-		x3 = hash_oid[0];
+		x3 = hash_oid[0]; printf("x3: %d\n", x3);
 		pad_len = x3 + 9;
 		memset(pad2, 0, pad_len);
-		zlen = sig_len - u - hash_len;
+		zlen = sig_len - u - hash_len; printf("zlen: %d\n", zlen); printf("pad_len: %d\n", pad_len);
 		if (zlen == pad_len) {
 			x2 = x3 + 2;
 		} else if (zlen == pad_len + 2) {
@@ -110,13 +110,13 @@ br_rsa_pkcs1_sig_unpad(const unsigned char *sig, size_t sig_len,
 		pad2[3] = 0x30;
 		pad2[4] = x2;
 		pad2[5] = 0x06;
-		memcpy(pad2 + 6, hash_oid, x3 + 1);
+		memcpy(pad2 + 6, hash_oid, x3 + 1); printf("pad2: \n"); for (int i = 0; i < x3 + 1; i++) { printf("%02x", hash_oid[i]); } printf("\n");
 		pad2[pad_len - 2] = 0x04;
 		pad2[pad_len - 1] = hash_len;
 		if (g_memcmp(pad2, sig + u, pad_len) != 0) {
 			return 0;
 		}
 	}
-	memcpy(hash_out, sig + sig_len - hash_len, hash_len);
+	memcpy(hash_out, sig + sig_len - hash_len, hash_len); printf("hash_out: \n"); for (int i = 0; i < hash_len; i++) { printf("%02x", hash_out[i]); } printf("\n");
 	return 1;
 }
