@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "g_header.h"
+#include "../../ct-verif.h"
 
 typedef struct {
 	uint32_t *dp;
@@ -136,7 +137,6 @@ make_pms_rsa(br_ssl_client_context *ctx, int prf_id)
 	if (nlen > sizeof ctx->eng.pad) {
 		return -BR_ERR_LIMIT_EXCEEDED;
 	}
-	printf("pkey:\n"); for (int i = 0; i < nlen; i++) { printf("%02x", pk->key.rsa.n[i]); } printf("\n");
 	/*
 	 * Make PMS.
 	 */
@@ -252,8 +252,8 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 			return BR_ERR_INVALID_ALGORITHM;
 		}
 		hv_len = 36;
-	} printf("use_rsa: %d\n", use_rsa);
-	if (use_rsa) { printf("using rsa: %d\n", use_rsa);
+	}
+	if (use_rsa) {
 		unsigned char tmp[64];
 		const unsigned char *hash_oid;
 
@@ -261,7 +261,7 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 			hash_oid = HASH_OID[hash - 2];
 		} else {
 			hash_oid = NULL;
-		} printf("hash_oid:\n"); for (int i = 0; i < hv_len; i++) { printf("%02x", hash_oid[i]); } printf("\n");
+		}
 		// if (!ctx->eng.irsavrfy(ctx->eng.pad, sig_len,
 		// 	hash_oid, hv_len, &pk->key.rsa, tmp)
 		// 	|| g_memcmp(tmp, hv, hv_len) != 0)
@@ -271,7 +271,7 @@ verify_SKE_sig(br_ssl_client_context *ctx,
 		{
 			return BR_ERR_BAD_SIGNATURE;
 		}
-	} else { printf("not using rsa: %d\n", use_rsa);
+	} else {
 		// if (!ctx->eng.iecdsa(ctx->eng.iec, hv, hv_len, &pk->key.ec,
 		// 	ctx->eng.pad, sig_len))
 		if (!g_iecdsa(ctx->eng.iecdsa, ctx->eng.iec, hv, hv_len, &pk->key.ec,
@@ -333,6 +333,7 @@ make_pms_ecdh(br_ssl_client_context *ctx, unsigned ecdhe, int prf_id)
 		mask >>= 1;
 	}
 	br_hmac_drbg_generate(&ctx->eng.rng, key, olen);
+	__SMACK_values(key, 32); // TODO: need to mark this as secret
 	key[0] &= mask;
 	key[olen - 1] |= 0x01;
 
@@ -346,7 +347,7 @@ make_pms_ecdh(br_ssl_client_context *ctx, unsigned ecdhe, int prf_id)
 		return -BR_ERR_INVALID_ALGORITHM;
 	}
 
-	memcpy(point, point_src, glen); printf("point:\n"); for (int i = 0; i < glen; i++) printf("%02x", point[i]); printf("\n");
+	memcpy(point, point_src, glen);
 	// if (!ctx->eng.iec->mul(point, glen, key, olen, curve)) {
 	if (!g_mul(ctx->eng.iec->mul, point, glen, key, olen, curve)) {
 		return -BR_ERR_INVALID_ALGORITHM;
@@ -1000,7 +1001,7 @@ br_ssl_hs_client_run(void *t0ctx)
 		uint32_t t0x;
 
 	t0_next:
-		t0x = T0_NEXT(&ip); printf("inline$br_ssl_hs_client_run.cross_product$2$$i156 <- 0x%x inline$br_ssl_hs_client_run.cross_product$2$$bb2 10219276\n", t0x);
+		t0x = T0_NEXT(&ip);
 		if (t0x < T0_INTERPRETED) {
 			switch (t0x) {
 				int32_t t0off;
@@ -1054,7 +1055,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	uint32_t b = T0_POP();
 	uint32_t a = T0_POP();
-	T0_PUSH(a + b); printf("inline$br_ssl_hs_client_run.cross_product$0$$i422 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", a + b);
+	T0_PUSH(a + b);
 
 				}
 				break;
@@ -1063,7 +1064,7 @@ br_ssl_hs_client_run(void *t0ctx)
 
 	uint32_t b = T0_POP();
 	uint32_t a = T0_POP();
-	T0_PUSH(a - b); printf("inline$br_ssl_hs_client_run.cross_product$1$$i430 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", a - b);
+	T0_PUSH(a - b);
 
 				}
 				break;
@@ -1303,7 +1304,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* data-get8 */
 
 	size_t addr = T0_POP();
-	T0_PUSH(t0_datablock[addr]); printf("inline$br_ssl_hs_client_run.cross_product$0$$i93026 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", t0_datablock[addr]);
+	T0_PUSH(t0_datablock[addr]);
 
 				}
 				break;
@@ -1348,7 +1349,7 @@ br_ssl_hs_client_run(void *t0ctx)
 			case 35: {
 				/* do-rsa-encrypt */
 	// TODO: verify make_pms_rsa
-	abort();
+	__VERIFIER_assume(0);
 
 	// int x;
 
@@ -1462,7 +1463,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get16 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*(uint16_t *)(void *)((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$0$$i125128 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *(uint16_t *)(void *)((unsigned char *)ENG + addr));
+	T0_PUSH(*(uint16_t *)(void *)((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1470,7 +1471,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get32 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*(uint32_t *)(void *)((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$0$$i125140 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *(uint32_t *)(void *)((unsigned char *)ENG + addr));
+	T0_PUSH(*(uint32_t *)(void *)((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1478,7 +1479,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* get8 */
 
 	size_t addr = (size_t)T0_POP();
-	T0_PUSH(*((unsigned char *)ENG + addr)); printf("inline$br_ssl_hs_client_run.cross_product$1$$i125151 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", *((unsigned char *)ENG + addr));
+	T0_PUSH(*((unsigned char *)ENG + addr));
 
 				}
 				break;
@@ -1573,7 +1574,7 @@ br_ssl_hs_client_run(void *t0ctx)
 		if ((size_t)len < clen) {
 			clen = (size_t)len;
 		}
-		memcpy((unsigned char *)ENG + addr, ENG->hbuf_in, clen); printf("hbuf_in:\n"); for (int i = 0; i < clen; i++) printf("%02x", ENG->hbuf_in[i]); printf("\n");
+		memcpy((unsigned char *)ENG + addr, ENG->hbuf_in, clen);
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
 			br_multihash_update(&ENG->mhash, ENG->hbuf_in, clen);
 		}
@@ -1589,7 +1590,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* read8-native */
 	if (ENG->hlen_in > 0) {
 		unsigned char x;
-		x = *ENG->hbuf_in ++; printf("inline$br_ssl_hs_client_run.cross_product$0$$i212396 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", x);
+		x = *ENG->hbuf_in ++;
 		if (ENG->record_type_in == BR_SSL_HANDSHAKE) {
 			br_multihash_update(&ENG->mhash, &x, 1);
 		}
@@ -1643,7 +1644,7 @@ br_ssl_hs_client_run(void *t0ctx)
 				/* g_strlen */
 
 	void *str = (unsigned char *)ENG + (size_t)T0_POP();
-	T0_PUSH((uint32_t)g_strlen(str)); printf("inline$br_ssl_hs_client_run.cross_product$2$$i215603 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", T0_PEEK(0));
+	T0_PUSH((uint32_t)g_strlen(str));
 
 				}
 				break;
@@ -1847,11 +1848,11 @@ br_ssl_hs_client_run(void *t0ctx)
 			case 80: {
 				/* verify-SKE-sig */
 
-	size_t sig_len = T0_POP(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786219 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", sig_len);
-	int use_rsa = T0_POPi(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786222 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", use_rsa);
-	int hash = T0_POPi(); printf("inline$br_ssl_hs_client_run.cross_product$0$$i786225 <- 0x%x inline$br_ssl_hs_client_run.cross_product$0$$bb7951 2984187\n", hash);
+	size_t sig_len = T0_POP();
+	int use_rsa = T0_POPi();
+	int hash = T0_POPi();
 
-	T0_PUSH(verify_SKE_sig(CTX, hash, use_rsa, sig_len)); printf("verify_SKE_sig: %d\n", T0_PEEK(0));
+	T0_PUSH(verify_SKE_sig(CTX, hash, use_rsa, sig_len));
 
 				}
 				break;

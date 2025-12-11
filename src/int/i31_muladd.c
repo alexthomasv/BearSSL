@@ -88,7 +88,7 @@ br_i31_muladd_small(uint32_t *x, uint32_t z, const uint32_t *m)
 		x[1] = z;
 		a1 = x[mlen];
 		b0 = m[mlen];
-	} else {
+	} else { // TODO: unreachable code
 		a0 = ((x[mlen] << (31 - mblr)) | (x[mlen - 1] >> mblr))
 			& 0x7FFFFFFF;
 		g_memmove(x + 2, x + 1, (mlen - 1) * sizeof *x);

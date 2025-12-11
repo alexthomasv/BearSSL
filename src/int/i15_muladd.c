@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /*
  * Constant-time division. The divisor must not be larger than 16 bits,
@@ -109,13 +110,13 @@ br_i15_muladd_small(uint16_t *x, uint16_t z, const uint16_t *m)
 	hi = x[mlen];
 	if (mblr == 0) {
 		a0 = x[mlen];
-		memmove(x + 2, x + 1, (mlen - 1) * sizeof *x);
+		g_memmove(x + 2, x + 1, (mlen - 1) * sizeof *x);
 		x[1] = z;
 		a = (a0 << 15) + x[mlen];
 		b = m[mlen];
 	} else {
 		a0 = (x[mlen] << (15 - mblr)) | (x[mlen - 1] >> mblr);
-		memmove(x + 2, x + 1, (mlen - 1) * sizeof *x);
+		g_memmove(x + 2, x + 1, (mlen - 1) * sizeof *x);
 		x[1] = z;
 		a = (a0 << 15) | (((x[mlen] << (15 - mblr))
 			| (x[mlen - 1] >> mblr)) & 0x7FFF);

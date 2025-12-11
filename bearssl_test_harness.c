@@ -274,7 +274,7 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 		#ifdef TEST
 		rlen = mem_recv(ctx, buf, len);
 		# else
-		rlen = read(*(int *)ctx, buf, len); printf("$i201459 <- 0x%x $bb7577\n", rlen);
+		rlen = read(*(int *)ctx, buf, len);
 		#endif // TEST
 		if (rlen <= 0) {
 			if (rlen < 0 && errno == EINTR) {
@@ -282,9 +282,9 @@ sock_read(void *ctx, unsigned char *buf, size_t len)
 			}
 			return -1;
 		}
-		printf("msg: rlen: %zu\n", rlen);
-		dump_buffer(buf, rlen);
-		printf("msg end\n");
+		// printf("msg: rlen: %zu\n", rlen);
+		// dump_buffer(buf, rlen);
+		// printf("msg end\n");
 		return (int)rlen;
 	}
 }
@@ -295,7 +295,7 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
 	for (;;) {
 		ssize_t wlen;
 
-		wlen = write(*(int *)ctx, buf, len); printf("msg: wlen: %zu\n", wlen); dump_buffer(buf, wlen); printf("msg end\n");
+		wlen = write(*(int *)ctx, buf, len);
 		if (wlen <= 0) {
 			if (wlen < 0 && errno == EINTR) {
 				continue;

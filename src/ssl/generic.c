@@ -7,7 +7,7 @@ int g_read(void* fn_pointer, void *read_context,
 		return sock_read(read_context, data, len);
 	} else {
 		printf("g_read: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -17,14 +17,14 @@ int g_write(void* fn_pointer, void *write_context,
 		return sock_write(write_context, data, len);
 	} else {
 		printf("g_write: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
 size_t g_do_sign(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		int hash_id, size_t hv_len, unsigned char *data, size_t len){
 	printf("g_do_sign: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 uint32_t g_mul(void *fn_pointer, unsigned char *G, size_t Glen,
@@ -33,7 +33,7 @@ uint32_t g_mul(void *fn_pointer, unsigned char *G, size_t Glen,
 		return ec_all_m31_api_mul(G, Glen, x, xlen, curve);
 	} else {
 		printf("g_mul: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -43,7 +43,7 @@ size_t g_mulgen(void *fn_pointer, unsigned char *R,
 		return ec_all_m31_api_mulgen(R, x, xlen, curve);
 	} else {
 		printf("g_mulgen: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -52,7 +52,7 @@ const unsigned char *g_order(void *fn_pointer, int curve, size_t *len){
 		return ec_all_m31_api_order(curve, len);
 	} else {
 		printf("g_order: %p, curve: %d\n", fn_pointer, curve);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -61,7 +61,7 @@ size_t g_xoff(void *fn_pointer, int curve, size_t *len){
 		return ec_all_m31_api_xoff(curve, len);
 	} else {
 		printf("g_xoff: %p, curve: %d\n", fn_pointer, curve);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -72,7 +72,7 @@ uint32_t g_irsavrfy(void *fn_pointer, const unsigned char *x, size_t xlen,
 		return br_rsa_i31_pkcs1_vrfy(x, xlen, hash_oid, hash_len, pk, hash_out);
 	} else {
 		printf("g_irsavrfy: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -82,7 +82,7 @@ const br_x509_pkey *g_get_pkey(void *fn_pointer,
 		return xm_get_pkey(ctx, usages);
 	} else {
 		printf("g_get_pkey: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -93,7 +93,7 @@ void g_prf(void *fn_pointer, void *dst, size_t len,
 		return br_tls12_sha256_prf(dst, len, secret, secret_len, label, seed_num, seed);
 	} else {
 		printf("g_prf: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -101,7 +101,7 @@ void g_choose(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		const br_ssl_client_context *cc, uint32_t auth_types,
 		br_ssl_client_certificate *choices){
 	printf("g_choose: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_start_chain(void *fn_pointer, const br_x509_class **ctx,
@@ -110,7 +110,7 @@ void g_start_chain(void *fn_pointer, const br_x509_class **ctx,
 		xm_start_chain(ctx, server_name);
 	} else {
 		printf("g_start_chain: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -120,7 +120,7 @@ void g_start_cert(void *fn_pointer, const br_x509_class **ctx,
 		xm_start_cert(ctx, cert_type);
 	} else {
 		printf("g_start_cert: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -130,7 +130,7 @@ void g_append(void *fn_pointer, const br_x509_class **ctx,
 		xm_append(ctx, data, len);
 	} else {
 		printf("g_append: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -139,7 +139,7 @@ void g_end_cert(void *fn_pointer, const br_x509_class **ctx){
 		xm_end_cert(ctx);
 	} else {
 		printf("g_end_cert: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -148,7 +148,7 @@ unsigned g_end_chain(void *fn_pointer, const br_x509_class **ctx){
 		return xm_end_chain(ctx);
 	} else {
 		printf("g_end_chain: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -171,7 +171,7 @@ void generic_max_plaintext(void *fn_pointer, const br_sslrec_out_class *const *c
 	// } 
 	else {
 		printf("generic_max_plaintext: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -182,7 +182,7 @@ void generic_clear_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx,
 	if (fn_pointer == &clear_encrypt) {
 		clear_encrypt(ctx, record_type, version, plaintext, len);
 	} else {	
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -191,7 +191,7 @@ void generic_enc_init(void *fn_pointer, const br_block_cbcenc_class **ctx,
 	if (fn_pointer == &br_aes_ct64_cbcenc_init) {
 		br_aes_ct64_cbcenc_init(ctx, key, key_len);
 	} else{
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -200,7 +200,7 @@ void g_br_block_run(void *fn_pointer, const br_block_cbcenc_class **ctx,
 	if (fn_pointer == &br_aes_ct64_cbcenc_run) {
 		br_aes_ct64_cbcenc_run(ctx, iv, data, len);
 	} else{
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -209,7 +209,7 @@ uint32_t g_br_block_ctr_run(void *fn_pointer, const br_block_ctr_class *const *c
 	if (fn_pointer == &br_aes_ct64_ctr_run) {
 		return br_aes_ct64_ctr_run(ctx, iv, cc, data, len);
 	} else{
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -238,7 +238,7 @@ unsigned char *generic_encrypt(void *fn_pointer, const br_sslrec_out_class **ctx
 	// } 
 	else {
 		printf("generic_encrypt: %p, %p, %p\n", fn_pointer, clear_encrypt, &clear_encrypt);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -258,7 +258,7 @@ unsigned char *generic_decrypt(void *fn_pointer, const br_sslrec_in_class **ctx,
 	// 	return cbc_decrypt(ctx, record_type, version, ciphertext, len);
 	// } 
 	else {
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -268,7 +268,7 @@ void generic_ipoly(void *fn_pointer, const void *key, const void *iv,
 	if (fn_pointer == &br_poly1305_ctmul_run) {
 		br_poly1305_ctmul_run(key, iv, data, len, aad, aad_len, tag, ichacha, encrypt);
 	} else {
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -278,7 +278,7 @@ uint32_t generic_chacha(void *fn_pointer, const void *key,
 		return br_chacha20_ct_run(key, iv, cc, data, len);
 	} else {
 		printf("generic_chacha: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -287,7 +287,7 @@ void generic_ghash(void *fn_pointer, void *y, const void *h, const void *data, s
 		br_ghash_ctmul64(y, h, data, len);
 	} else {
 		printf("generic_ghash: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -297,7 +297,7 @@ void g_br_block_init(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 		br_aes_ct64_ctrcbc_init(ctx, key, key_len);
 	} else {
 		printf("g_br_block_init: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -307,7 +307,7 @@ void g_br_block_encrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 		br_aes_ct64_ctrcbc_encrypt(ctx, ctr, cbcmac, data, len);
 	} else {
 		printf("g_br_block_encrypt: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -317,7 +317,7 @@ void g_br_block_decrypt(void *fn_pointer, const br_block_ctrcbc_class *const *ct
 		br_aes_ct64_ctrcbc_decrypt(ctx, ctr, cbcmac, data, len);
 	} else {
 		printf("g_br_block_decrypt: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -327,7 +327,7 @@ void g_br_block_ctr(void *fn_pointer, const br_block_ctrcbc_class *const *ctx,
 		br_aes_ct64_ctrcbc_ctr(ctx, ctr, data, len);
 	} else {
 		printf("g_br_block_ctr: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -337,7 +337,7 @@ void g_br_block_mac(void *fn_pointer, const br_block_cbcenc_class *const *ctx,
 		br_aes_ct64_ctrcbc_mac(ctx, cbcmac, data, len);
 	} else {
 		printf("g_br_block_mac: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -362,7 +362,7 @@ void generic_hash_init(void *fn_pointer, const br_hash_class **ctx){
 	} 
 	else {
 		printf("generic_hash_init: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -387,7 +387,7 @@ void generic_hash_update(void *fn_pointer, const br_hash_class *const *ctx, cons
 	// } 
 	else {
 		printf("generic_hash_update: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -412,7 +412,7 @@ void generic_hash_out(void *fn_pointer, const br_hash_class *const *ctx, void *d
 	// } 
 	else {
 		printf("generic_hash_out: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -437,7 +437,7 @@ uint64_t generic_hash_state(void *fn_pointer, const br_hash_class *const *ctx, v
 	// } 
 	else {
 		printf("generic_hash_state: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -462,7 +462,7 @@ void generic_hash_set_state(void *fn_pointer, const br_hash_class *const *ctx, v
 	// } 
 	else {
 		printf("generic_set_state: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -481,14 +481,14 @@ int generic_check_length(void *fn_pointer, const br_sslrec_in_class **ctx, size_
 	// } 
 	else {
 		printf("generic_check_length: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
 uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char *B, size_t len,
 	const unsigned char *x, size_t xlen,
 	const unsigned char *y, size_t ylen, int curve){
-	abort();
+	__VERIFIER_assume(0);
 	// if (fn_pointer == &ec_c_25519_i15_api_muladd) {
 	// 	return ec_c_25519_i15_api_muladd(A, B, len, x, xlen, y, ylen, curve);
 	// } 
@@ -503,7 +503,7 @@ uint32_t generic_muladd(void *fn_pointer, unsigned char *A, const unsigned char 
 	// } 
 	// else {
 	// 	printf("generic_muladd: %p\n", fn_pointer);
-	// 	abort();
+	// 	__VERIFIER_assume(0);
 	// }
 }
 
@@ -512,14 +512,14 @@ void g_generator(void *fn_pointer, int curve, size_t *len){
 		ec_all_m31_api_generator(curve, len);
 	} else {
 		printf("g_generator: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
 uint32_t g_do_keyx(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		unsigned char *data, size_t *len){
 	printf("g_do_keyx: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 uint32_t g_iecdsa(void *fn_pointer, const br_ec_impl *impl,
@@ -529,7 +529,7 @@ uint32_t g_iecdsa(void *fn_pointer, const br_ec_impl *impl,
 		return br_ecdsa_i31_vrfy_asn1(impl, hash, hash_len, pk, sig, sig_len);
 	} else {
 		printf("g_iecdsa: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -540,7 +540,7 @@ uint32_t g_irsa(void *fn_pointer, const br_ec_impl *impl,
 		return br_rsa_i31_pkcs1_vrfy(impl, hash, hash_len, pk, sig, sig_len);
 	} else {
 		printf("g_irsa: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -550,7 +550,7 @@ void br_hash_dn_init(void *fn_pointer, const br_hash_class *const *ctx){
 		br_sha256_init(ctx);
 	} else {
 		printf("br_hash_dn_init: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -559,7 +559,7 @@ void br_hash_dn_update(void *fn_pointer, const br_hash_class *const *ctx, const 
 		br_sha256_update(ctx, data, len);
 	} else {
 		printf("br_hash_dn_update: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -568,7 +568,7 @@ void br_hash_dn_out(void *fn_pointer, const br_hash_class *const *ctx, void *dst
 		br_sha256_out(ctx, dst);
 	} else {
 		printf("br_hash_dn_out: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -577,7 +577,7 @@ void br_hash_dn_state(void *fn_pointer, const br_hash_class *const *ctx, void *o
 		br_sha256_state(ctx, out);
 	} else {
 		printf("br_hash_dn_state: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -586,7 +586,7 @@ void br_hash_dn_set_state(void *fn_pointer, const br_hash_class *const *ctx, voi
 		br_sha256_set_state(ctx, stb, count);
 	} else {
 		printf("br_hash_dn_set_state: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -598,7 +598,7 @@ void generic_hs_run(void *fn_pointer, void *cc){
 	// 	br_ssl_hs_server_run(cc);
 	// } 
 	else {
-		abort();
+		__VERIFIER_assume(0);
 	}
 
 
@@ -611,34 +611,34 @@ void generic_prf(void *fn_pointer, void *prf, void *dst, size_t len,
 		br_tls10_prf(dst, len, secret, secret_len, label, seed_num, seed);
 	} else {
 		printf("generic_prf: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
 void g_append_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx,
 		const unsigned char *data, size_t len){
 	printf("g_append_name: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_start_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
 	printf("g_start_name_list: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_end_name_list(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
 	printf("g_end_name_list: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_start_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx, size_t len){
 	printf("g_start_name: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_end_name(void *fn_pointer, const br_ssl_client_certificate_class **pctx){
 	printf("g_end_name: %p\n", fn_pointer);
-	abort();
+	__VERIFIER_assume(0);
 }
 
 void g_prng_update(void *fn_pointer, const br_prng_class **ctx,
@@ -647,7 +647,7 @@ void g_prng_update(void *fn_pointer, const br_prng_class **ctx,
 		br_hmac_drbg_update(ctx, seed, seed_len);
 	} else {
 		printf("g_prng_update: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -658,7 +658,7 @@ unsigned char *g_irsapub(void *fn_pointer,
 		return br_rsa_i31_public(x, xlen, pk);
 	} else {
 		printf("g_irsapub: %p\n", fn_pointer);
-		abort();
+		__VERIFIER_assume(0);
 	}
 }
 
@@ -666,5 +666,5 @@ unsigned char *g_irsapub(void *fn_pointer,
 int g_time(void *fn_pointer, void *tctx,
 	uint32_t not_before_days, uint32_t not_before_seconds,
 	uint32_t not_after_days, uint32_t not_after_seconds){
-	abort();
+	__VERIFIER_assume(0);
 }

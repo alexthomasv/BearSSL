@@ -57,7 +57,7 @@ br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
 	 * an ASN.1 NULL value for the hash parameters) may be slightly
 	 * more "standard" than the opposite.
 	 */
-	xlen = (n_bitlen + 7) >> 3;
+	xlen = (n_bitlen + 7) >> 3; printf("xlen: %zu\n", xlen);
 
 	if (hash_oid == NULL) {
 		if (xlen < hash_len + 11) {
@@ -69,13 +69,13 @@ br_rsa_pkcs1_sig_pad(const unsigned char *hash_oid,
 		memset(x + 2, 0xFF, u - 3);
 		x[u - 1] = 0x00;
 	} else {
-		x3 = hash_oid[0];
+		x3 = hash_oid[0]; printf("x3: %d\n", x3);
 
 		/*
 		 * Check that there is enough room for all the elements,
 		 * including at least eight bytes of value 0xFF.
 		 */
-		if (xlen < (x3 + hash_len + 21)) {
+		if (xlen < (x3 + hash_len + 21)) { printf("xlen: %zu\n", xlen);
 			return 0;
 		}
 		x[0] = 0x00;

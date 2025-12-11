@@ -92,8 +92,8 @@ br_i31_montymul(uint32_t *d, const uint32_t *x, const uint32_t *y,
 				+ MUL31(f, m[v + 4]) + r;
 			r = z >> 31;
 			d[v + 3] = (uint32_t)z & 0x7FFFFFFF;
-		}
-		for (; v < len; v ++) {
+		} // TODO: Loop invariant needed
+		for (; v < len; v ++) { // show that v in [1440 1444]
 			uint64_t z;
 
 			z = (uint64_t)d[v + 1] + MUL31(xu, y[v + 1])

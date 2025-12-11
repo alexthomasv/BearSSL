@@ -28,6 +28,23 @@
 #include "bearssl.h"
 #include "inner.h"
 
+
+static const unsigned char BR_HASH_OID_SHA1[] = {
+	0x05, 0x2B, 0x0E, 0x03, 0x02, 0x1A
+};
+static const unsigned char BR_HASH_OID_SHA224[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04
+};
+static const unsigned char BR_HASH_OID_SHA256[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01
+};
+static const unsigned char BR_HASH_OID_SHA384[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02
+};
+static const unsigned char BR_HASH_OID_SHA512[] = {
+	0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03
+};
+
 /*
  * Decode an hexadecimal string. Returned value is the number of decoded
  * bytes.
@@ -159,7 +176,7 @@ TEST_HASH(SHA-512, sha512)
 static void
 test_MD5(void)
 {
-	printf("Test MD5: ");
+	printf("Test MD5: "); 
 	fflush(stdout);
 	test_md5_internal("", "d41d8cd98f00b204e9800998ecf8427e");
 	test_md5_internal("a", "0cc175b9c0f1b6a831c399e269772661");
@@ -5878,6 +5895,15 @@ test_RSA_sign(const char *name, br_rsa_private fpriv,
 	 * (except the usual detail about hash function parameter
 	 * encoding, but OpenSSL uses the same convention as BearSSL).
 	 */
+	 for (int i = 0; i < 20; i++) {
+		printf("%02x", hv[i]);
+	 }
+	 printf("\n");
+	 for (int i = 0; i < 20; i++) {
+		printf("%02x", t2[i]);
+	 }
+	 printf("\n");
+	 fflush(stdout);
 	if (!fsign(SHA1_OID, hv, 20, &RSA_SK, t2)) {
 		fprintf(stderr, "Signature generation failed\n");
 		exit(EXIT_FAILURE);
@@ -6975,6 +7001,7 @@ test_RSA_i31(void)
 static void
 test_RSA_i32(void)
 {
+	printf("eowaifjwoi RSA i32 core\n");
 	test_RSA_core("RSA i32 core", &br_rsa_i32_public, &br_rsa_i32_private);
 	test_RSA_sign("RSA i32 sign", &br_rsa_i32_private,
 		&br_rsa_i32_pkcs1_sign, &br_rsa_i32_pkcs1_vrfy);

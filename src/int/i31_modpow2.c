@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 /* see inner.h */
 uint32_t
@@ -76,6 +77,21 @@ br_i31_modpow_opt(uint32_t *x,
 		memcpy(t2 + mwlen, x, mlen);
 		base = t2 + mwlen;
 		for (u = 2; u < ((unsigned)1 << win_len); u ++) {
+			__SMACK_code(
+				"assume {:loop_invariant} "
+				"$eq.i64("
+				  "@"                                           // LHS: base
+				  ", "
+				  "$add.i64("                                   // RHS: t2 + offset
+					"@"                                         // t2
+					", "
+					"$mul.i64(4, "                              // 4 bytes per element (uint32_t)
+					  "$mul.i64(@, $sub.i64(@, 1))"             // mwlen * (u - 1)
+					")"
+				  ")"
+				") == 1;",
+				base, t2, mwlen, u
+			);
 			br_i31_montymul(base + mwlen, base, x, m, m0i);
 			base += mwlen;
 		}
@@ -86,7 +102,7 @@ br_i31_modpow_opt(uint32_t *x,
 	 * be done efficiently by setting the high word to 1, then doing
 	 * one word-sized shift.
 	 */
-	br_i31_zero(x, m[0]);
+	br_i31_zero(x, m[0]); // x[0] <- m[0]
 	x[(m[0] + 31) >> 5] = 1;
 	br_i31_muladd_small(x, 0, m);
 

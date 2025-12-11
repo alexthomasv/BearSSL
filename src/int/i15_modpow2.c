@@ -148,7 +148,7 @@ br_i15_modpow_opt(uint16_t *x,
 		 * Multiply with the looked-up value. We keep the
 		 * product only if the exponent bits are not all-zero.
 		 */
-		br_i15_montymul(t1, x, t2, m, m0i);
+		br_i15_montymul(t1, x, t2, m, m0i); // t1[0] is set here  t1[0] <- m[0]
 		CCOPY(NEQ(bits, 0), x, t1, mlen);
 	}
 

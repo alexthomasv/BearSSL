@@ -23,6 +23,8 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
+
 
 /* see inner.h */
 void
@@ -38,18 +40,36 @@ br_i31_decode(uint32_t *x, const void *src, size_t len)
 	v = 1;
 	acc = 0;
 	acc_len = 0;
-	while (u -- > 0) {
+	while (u > 0) { // u >= 0 and u <= len, v >= 1 and v < 
+		__SMACK_code(
+			"assume {:loop_invariant} "
+			"$eq.i64("
+				// LHS: 8 * (len - u)
+				// This represents the total raw bits processed from the source so far.
+				"$mul.i64(8, $sub.i64(@, @)), "
+		
+				// RHS: 31 * (v - 1) + acc_len
+				// This represents the total bits stored in 'x' plus the bits currently buffering in 'acc'.
+				"$add.i64("
+					"$mul.i64(31, $sub.i64(@, 1)), "
+					"@"
+				")"
+			") == 1;",
+			len, u,      // Arguments for LHS
+			v, acc_len   // Arguments for RHS
+		);
+		u--;
 		uint32_t b;
 
 		b = buf[u];
 		acc |= (b << acc_len);
 		acc_len += 8;
 		if (acc_len >= 31) {
-			x[v ++] = acc & (uint32_t)0x7FFFFFFF;
-			acc_len -= 31;
+			x[v ++] = acc & (uint32_t)0x7FFFFFFF; // v in [1, 32]
+			acc_len -= 31; // its [1, 33] after v is incremented though 
 			acc = b >> (8 - acc_len);
-		}
-	}
+		} // v < u // 4
+	} // TODO: Loop invariant needed
 	if (acc_len != 0) {
 		x[v ++] = acc;
 	}

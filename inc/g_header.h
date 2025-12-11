@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "inner.h"   /* BearSSL internal structs (br_sslrec_*, br_hash_*, …) */
+#include "../../ct-verif.h"
 
 /*--------------------------------------------------------------------
  *  Record-layer helpers
@@ -541,16 +542,16 @@ void *g_memmove(void *dest, const void *src, size_t n)
      *
      *  Copying in the correct direction prevents the source byte
      *  from being overwritten before we read it.
-     */
+     */ // n = 64
     if (d < s) {
         /* ---------- forward copy ---------- */
         for (size_t i = 0; i < n; ++i)
             d[i] = s[i];
-    } else {
+    } else { // TODO: unreachable code
         /* ---------- backward copy ---------- */
-        /* Start from the last byte and move toward the first. */
-        for (size_t i = n; i-- > 0; )
-            d[i] = s[i];
+        /* Start from the last byte and move toward the first. */ // n = 64
+        for (size_t i = n; i > 0; i--)
+    		d[i-1] = s[i-1];
     }
 
     return dest;

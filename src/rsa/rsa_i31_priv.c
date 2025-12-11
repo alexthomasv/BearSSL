@@ -23,6 +23,7 @@
  */
 
 #include "inner.h"
+#include "g_header.h"
 
 #define U      (2 + ((BR_MAX_RSA_FACTOR + 30) / 31))
 #define TLEN   (8 * U)
@@ -62,10 +63,21 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	/*
 	 * Compute the maximum factor length, in words.
 	 */
-	z = (long)(plen > qlen ? plen : qlen) << 3;
+	z = (long)(plen > qlen ? plen : qlen) << 3; // Show qlen is 0 at this point
+	long z_0 = z;
 	fwlen = 1;
 	while (z > 0) {
-		z -= 31;
+		__SMACK_code(
+			"assume {:loop_invariant} "
+			"$eq.i64("                                     // LHS: Is z + ... == z_0 ?
+			  "$add.i64(@, "                               // z + ...
+				"$mul.i64(31, $sub.i64(@, 1))"             // 31 * (fwlen - 1)
+			  "), "
+			  "@"                                          // RHS: z_0
+			") == 1;",                                     // Explicitly check if result == 1
+			z, fwlen, z_0
+		  );	
+		z -= 31; // fwlen = (z - 31 * i)//31;  
 		fwlen ++;
 	}
 
@@ -90,7 +102,7 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * Decode q.
 	 */
 	mq = tmp;
-	br_i31_decode(mq, q, qlen);
+	br_i31_decode(mq, q, qlen); // mq[0] is set here 
 
 	/*
 	 * Decode p.
@@ -104,7 +116,7 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * already used later on.
 	 */
 	t2 = mq + 2 * fwlen;
-	br_i31_zero(t2, mq[0]);
+	br_i31_zero(t2, mq[0]); // t2[0] is set here 
 	br_i31_mulacc(t2, mq, t1);
 
 	/*
@@ -133,7 +145,8 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	 * Move the decoded p to another temporary buffer.
 	 */
 	mp = mq + 2 * fwlen;
-	memmove(mp, t1, fwlen * sizeof *t1);
+	// memmove(mp, t1, fwlen * sizeof *t1);
+	g_memmove(mp, t1, fwlen * sizeof *t1);
 
 	/*
 	 * Compute s2 = x^dq mod q.

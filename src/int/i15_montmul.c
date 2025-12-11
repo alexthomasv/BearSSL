@@ -156,7 +156,7 @@ loop%=:                                                            \n\
 			r = z >> 15;
 			d[v + 3] = z & 0x7FFF;
 		}
-#endif
+#endif // TODO: Loop invariant needed
 		for (; v < len; v ++) {
 			uint32_t z;
 
@@ -174,7 +174,7 @@ loop%=:                                                            \n\
 	/*
 	 * Restore the bit length (it was overwritten in the loop above).
 	 */
-	d[0] = m[0];
+	d[0] = m[0]; // SWHH: d[0] is set here 
 
 	/*
 	 * d[] may be greater than m[], but it is still lower than twice

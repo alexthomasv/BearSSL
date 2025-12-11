@@ -45,4 +45,7 @@ endif: all
 !endif
 
 server_basic:
-	gcc samples/server_basic.c -o server_basic -I ./inc build/libbearssl.a
+	gcc samples/server_basic.c -o server_basic -I ./inc build/libbearssl.a -DCOMPILE
+
+test_crypto: test/test_crypto.c
+	gcc test/test_crypto.c -o test_crypto -I ./inc -I ./src build/libbearssl.a
