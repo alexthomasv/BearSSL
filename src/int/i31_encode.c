@@ -38,11 +38,33 @@ br_i31_encode(void *dst, size_t len, const uint32_t *x)
 		memset(dst, 0, len);
 		return;
 	}
+	size_t start_len = len;
 	buf = (unsigned char *)dst + len;
 	k = 1;
 	acc = 0;
 	acc_len = 0;
 	while (len != 0) {
+		__SMACK_code(
+			"assume {:loop_invariant} "
+			"$and.i1("
+				// 1. Bit Conservation Formula
+				// 31 * (k - 1) == 8 * (start_len - len) + acc_len
+				"$eq.i64("
+					"$mul.i64(31, $sub.i64(@, 1)), "    // LHS: 31 * (k - 1)
+					"$add.i64("                         // RHS
+						"$mul.i64(8, $sub.i64(@, @)), " // 8 * (start_len - len)
+						"@"                             // acc_len
+					")"
+				"), "
+				// 2. Length Safety (len <= start_len)
+				"$sle.i64(@, @)"
+			") == 1;",
+			// Arguments
+			k,                  // LHS
+			start_len, len,     // RHS term 1 (start_len - len)
+			acc_len,            // RHS term 2
+			len, start_len      // Len bounds
+		);
 		uint32_t w;
 
 		w = (k <= xlen) ? x[k] : 0;

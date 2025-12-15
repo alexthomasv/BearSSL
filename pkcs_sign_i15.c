@@ -9,23 +9,32 @@ void sign_wrapper(const unsigned char *hash_oid,
 	public_in(__SMACK_value(sk));
 	public_in(__SMACK_value(x));
 
-	public_in(__SMACK_value(sk->p));
-	public_in(__SMACK_value(sk->q));
-	public_in(__SMACK_value(sk->dp));
-	public_in(__SMACK_value(sk->dq));
-	public_in(__SMACK_value(sk->iq));
 
-	public_in(__SMACK_value(sk->plen));
-	public_in(__SMACK_value(sk->qlen));
-	public_in(__SMACK_value(sk->dplen));
-	public_in(__SMACK_value(sk->dqlen));
-	public_in(__SMACK_value(sk->iqlen));
-	public_in(__SMACK_value(sk->iqlen));
 	public_in(__SMACK_value(sk->n_bitlen));
 
-	public_in(__SMACK_values(hash_oid, 64));
-	public_in(__SMACK_values(hash, 64));
-	public_in(__SMACK_values(x, 64));
+	public_in(__SMACK_value(sk->p));
+	private_in(__SMACK_values(sk->p, 64));
+	public_in(__SMACK_value(sk->plen));
+
+	public_in(__SMACK_value(sk->q));
+	private_in(__SMACK_values(sk->q, 64));
+	public_in(__SMACK_value(sk->qlen));
+
+	public_in(__SMACK_value(sk->dp));
+	private_in(__SMACK_values(sk->dp, 64));
+	public_in(__SMACK_value(sk->dplen));
+
+	public_in(__SMACK_value(sk->dq));
+	private_in(__SMACK_values(sk->dq, 64));
+	public_in(__SMACK_value(sk->dqlen));
+
+	public_in(__SMACK_value(sk->iq));
+	private_in(__SMACK_values(sk->iq, 64));
+	public_in(__SMACK_value(sk->iqlen));
+
+	public_in(__SMACK_values(hash_oid, 6));
+	public_in(__SMACK_values(hash, 20));
+	public_in(__SMACK_values(x, 128));
 	
 	
 	br_rsa_i15_pkcs1_sign(hash_oid, hash, hash_len, sk, x);

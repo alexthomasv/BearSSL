@@ -54,7 +54,7 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 		plen --;
 	}
 	q = sk->q;
-	qlen = sk->qlen;
+	qlen = sk->qlen; // public(qlen);
 	while (qlen > 0 && *q == 0) {
 		q ++;
 		qlen --;
@@ -84,7 +84,7 @@ br_rsa_i31_private(unsigned char *x, const br_rsa_private_key *sk)
 	/*
 	 * Round up the word length to an even number.
 	 */
-	fwlen += (fwlen & 1);
+	fwlen += (fwlen & 1); // $i159
 
 	/*
 	 * We need to fit at least 6 values in the stack buffer.

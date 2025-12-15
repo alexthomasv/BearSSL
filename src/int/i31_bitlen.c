@@ -37,60 +37,70 @@ br_i31_bit_length(uint32_t *x, size_t xlen)
 
 	while (xlen > 0) {
         __SMACK_code(
-            "assume {:loop_invariant} {:custom \"br_i31_bit_length\"} {:free_var @} {:x @} {:xlen @} {:twk @} {:tw @} {:mem_map MEM(@)} "
+            "assume {:loop_invariant} {:custom \"br_i31_bit_length\"} "
+            "{:free_var @} {:x @} {:xlen @} {:twk @} {:tw @} {:mem_map MEM(@)} "
+            
             "$and.i1("
-                // 1. Witness Bounds (C < xlen_init)
+                // 1. Bounds Check
                 "$ult.i64(@, @), " 
         
                 "$and.i1("
-                    // -------------------------------------------------------
-                    // 2. Witness Property: x[C] != 0
-                    // Manual Load: load(MEM(x), x + C*4)
+                    // -----------------------------------------------------------
+                    // USER INVARIANT 1: x[C] != 0
+                    // This defines the 'Floor'. C must point to real data.
+                    // -----------------------------------------------------------
                     "$ne.i32("
                         "$load.i32(MEM(@), $add.i64(@, $mul.i64(@, 4))), " 
                         "0"
                     "), "
         
                     "$and.i1("
-                        // 3. Implication: (xlen <= C) ==> (twk == C)
-                        "$or.i1("
-                            "$ugt.i64(@, @), "          
-                            "$eq.i32(@, $trunc.i64.i32(@))" 
-                        "), "
+                        // 3. Locked Index Plumbing (Required for assert)
+                        "$or.i1($ugt.i64(@, @), $eq.i32(@, $trunc.i64.i32(@))), "
         
                         "$and.i1("
-                            // -----------------------------------------------
-                            // 4. Implication: (xlen <= C) ==> (tw == x[C])
-                            // Manual Load: val(MEM(x), x + C*4)
+                            // 4. Search Index Plumbing (Required for assert)
+                            "$or.i1($ule.i64(@, @), $eq.i32(@, $trunc.i64.i32(@))), "
+
+                            // ---------------------------------------------------
+                            // USER INVARIANT 2: xlen > C => x[xlen] == 0
+                            // This defines the 'Ceiling'.
+                            // Logic: (xlen <= C) OR (xlen == Start) OR (x[xlen] == 0)
+                            // ---------------------------------------------------
                             "$or.i1("
-                                "$ugt.i64(@, @), "      
-                                "$eq.i32(@, "           
-                                    "$load.i32(MEM(@), $add.i64(@, $mul.i64(@, 4)))"
+                                "$ule.i64(@, @), "          // Locked? (xlen <= C)
+                                "$or.i1("
+                                    "$eq.i64(@, @), "       // Start? (xlen == xlen_init)
+                                    "$eq.i32("              // Check Memory: x[xlen] == 0
+                                        "$load.i32(MEM(@), $add.i64(@, $mul.i64(@, 4))), "
+                                        "0"
+                                    ")"
                                 ")"
-                            "), "
-        
-                            // 5. Implication: (xlen > C) ==> (twk == xlen)
-                            "$or.i1("
-                                "$ule.i64(@, @), "          
-                                "$eq.i32(@, $trunc.i64.i32(@))" 
                             ")"
                         ")"
                     ")"
                 ")"
             ") == 1;",
-            // --- Argument Mapping ---
-            // 0. Free Variable (C)
+            // --- ARGUMENTS ---
+            // 0. Metadata
             C, x, xlen, twk, tw, x, 
-            // 1. Witness Bounds
+            
+            // 1. Bounds
             C, xlen_init,
-            // 2. Witness Non-Zero: Needs (x, x, C)
+            
+            // 2. USER INVARIANT 1 ARGS (x, C)
             x, x, C, 
-            // 3. Post-Latch Index
+            
+            // 3. Locked Index
             xlen, C, twk, C,
-            // 4. Post-Latch Value: Needs (xlen, C, tw) AND (x, x, C)
-            xlen, C, tw, x, x, C,
-            // 5. Pre-Latch Index
-            xlen, C, twk, xlen
+            
+            // 4. Search Index
+            xlen, C, twk, xlen,
+
+            // 5. USER INVARIANT 2 ARGS (xlen, C, xlen, xlen_init, x, xlen)
+            xlen, C,           // Check Lock
+            xlen, xlen_init,   // Check Start
+            x, x, xlen         // Check Memory
         );
 		xlen--;
         uint32_t c = EQ(tw, 0);
